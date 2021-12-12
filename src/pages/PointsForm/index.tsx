@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { Button } from '@chakra-ui/button'
 import {
   Box,
@@ -7,41 +9,108 @@ import {
   SimpleGrid,
   VStack,
 } from '@chakra-ui/layout'
-import { InputGroup, InputRightElement } from '@chakra-ui/react'
+import { useToast } from '@chakra-ui/react'
 import { useFormik, Form, FormikProvider } from 'formik'
 
 import { Input } from '../../components/Form/Input'
+import { Loading } from '../../components/Loading'
+import { apiCnpj } from '../../services'
+
+interface ICNPJResponse {
+  message: string
+  status: string
+  complemento: string
+  nome: string
+  uf: string
+  telefone: string
+  email: string
+  bairro: string
+  logradouro: string
+  numero: string
+  cep: string
+  municipio: string
+}
 
 const PointsForm = () => {
+  const [isLoading, setIsLoading] = useState(false)
+
   const formik = useFormik({
     initialValues: {
-      updatekind: 1,
-      id: 0,
-      cnpj: '22221122221100',
-      razaosocial: 'Posto Insomnia 2',
-      cep: '91530000',
-      logradouro: 'Av.Ipiranga',
-      numero: 6900,
+      cnpj: '',
+      razaosocial: '',
+      cep: '',
+      logradouro: '',
+      numero: '',
       complemento: '',
-      cidadeid: 4174,
-      cidadenome: 'Porto Alegre',
-      bairroid: 0,
-      uf: 'RS',
-      ufnome: 'Rio Grande do Sul',
+      cidadenome: '',
+      bairro: '',
+      ufnome: '',
       ativo: true,
-      latitude: 1,
-      longitude: 1,
-      inputedbygps: false,
     },
     // eslint-disable-next-line no-console
     onSubmit: (values) => console.log(values),
   })
 
+  const toast = useToast()
+  const getCompanyData = async () => {
+    setIsLoading(true)
+    try {
+      const {
+        data: {
+          status,
+          message,
+          bairro,
+          cep,
+          complemento,
+          // email,
+          logradouro,
+          municipio,
+          nome,
+          numero,
+          // telefone,
+          uf,
+        },
+      } = await apiCnpj.get<ICNPJResponse>(formik.values.cnpj)
+      if (status === 'ERROR') {
+        return toast({
+          title: message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+
+      formik.setValues({
+        ufnome: uf,
+        cep,
+        cidadenome: municipio,
+        ativo: true,
+        bairro,
+        cnpj: formik.values.cnpj,
+        complemento: complemento,
+        logradouro,
+        numero: numero,
+        razaosocial: nome,
+      })
+    } catch {
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <Box padding={'32'}>
+    <Box padding={{ xl: '20', md: '6', lg: '8' }}>
+      <Loading isLoading={isLoading} />
+
       <FormikProvider value={formik}>
         <Form onSubmit={formik.handleSubmit}>
-          <SimpleGrid spacing={'6'}>
+          <SimpleGrid spacing={'6'} maxWidth={1280} margin={'0 auto'}>
             <VStack spacing={'2'}>
               <Heading fontWeight={'normal'} size={'lg'} alignSelf={'start'}>
                 Informações do ponto
@@ -50,17 +119,18 @@ const PointsForm = () => {
               <HStack width={'100%'} spacing={'8'}>
                 <HStack alignItems={'flex-end'} width={'50%'}>
                   <Input
-                    pr={160}
+                    pr={110}
                     label={'Cnpj'}
                     name={'cnpj'}
                     rightElement={
                       <Button
-                        minWidth={150}
+                        minWidth={100}
                         size="sm"
                         bg={'blue.300'}
                         color={'white'}
+                        onClick={getCompanyData}
                       >
-                        Buscar CNPJ
+                        Preencher
                       </Button>
                     }
                   />
@@ -104,12 +174,21 @@ const PointsForm = () => {
                   <Input label={'Numero'} name={'numero'} width={'30%'} />
                 </HStack>
                 <HStack width={'50%'}>
-                  <Input label={'Bairro'} name={'bairroid'} />
+                  <Input label={'Bairro'} name={'bairro'} />
                 </HStack>
               </HStack>
-              <HStack width={'100%'} spacing={'8'}>
+              <HStack width={'100%'} spacing={'8'} justifyContent={'flex-end'}>
                 <HStack width={'50%'}>
                   <Input label={'Complemento'} name={'complemento'} />
+                </HStack>
+                <HStack width={'50%'} justifyContent={'flex-end'}>
+                  <SimpleGrid>
+                    <Input
+                      variant="switch"
+                      label={'Ponto de vendas ativo?'}
+                      name={'ativo'}
+                    />
+                  </SimpleGrid>
                 </HStack>
               </HStack>
             </VStack>
