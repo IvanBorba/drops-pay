@@ -7,6 +7,7 @@ import {
   SimpleGrid,
   VStack,
 } from '@chakra-ui/layout'
+import { InputGroup, InputRightElement } from '@chakra-ui/react'
 import { useFormik, Form, FormikProvider } from 'formik'
 
 import { Input } from '../../components/Form/Input'
@@ -14,13 +15,30 @@ import { Input } from '../../components/Form/Input'
 const PointsForm = () => {
   const formik = useFormik({
     initialValues: {
-      test: '',
+      updatekind: 1,
+      id: 0,
+      cnpj: '22221122221100',
+      razaosocial: 'Posto Insomnia 2',
+      cep: '91530000',
+      logradouro: 'Av.Ipiranga',
+      numero: 6900,
+      complemento: '',
+      cidadeid: 4174,
+      cidadenome: 'Porto Alegre',
+      bairroid: 0,
+      uf: 'RS',
+      ufnome: 'Rio Grande do Sul',
+      ativo: true,
+      latitude: 1,
+      longitude: 1,
+      inputedbygps: false,
     },
-    onSubmit: () => console.log('oi'),
+    // eslint-disable-next-line no-console
+    onSubmit: (values) => console.log(values),
   })
 
   return (
-    <Box padding={'4'}>
+    <Box padding={'32'}>
       <FormikProvider value={formik}>
         <Form onSubmit={formik.handleSubmit}>
           <SimpleGrid spacing={'6'}>
@@ -31,10 +49,21 @@ const PointsForm = () => {
               <Divider />
               <HStack width={'100%'} spacing={'8'}>
                 <HStack alignItems={'flex-end'} width={'50%'}>
-                  <Input label={'Cnpj'} name={'cnpj'} />
-                  <Button bg={'blue.300'} color={'white'} minWidth={150}>
-                    Buscar CNPJ
-                  </Button>
+                  <Input
+                    pr={160}
+                    label={'Cnpj'}
+                    name={'cnpj'}
+                    rightElement={
+                      <Button
+                        minWidth={150}
+                        size="sm"
+                        bg={'blue.300'}
+                        color={'white'}
+                      >
+                        Buscar CNPJ
+                      </Button>
+                    }
+                  />
                 </HStack>
                 <HStack width={'50%'}>
                   <Input label={'Razão Social'} name={'razaosocial'} />
@@ -48,10 +77,21 @@ const PointsForm = () => {
               <Divider />
               <HStack width={'100%'} spacing={'8'}>
                 <HStack width={'50%'} alignItems={'flex-end'}>
-                  <Input label={'Cep'} name={'cep'} />
-                  <Button bg={'blue.300'} color={'white'} minWidth={150}>
-                    Buscar CEP
-                  </Button>
+                  <Input
+                    pr={160}
+                    label={'Cep'}
+                    name={'cep'}
+                    rightElement={
+                      <Button
+                        minWidth={150}
+                        size="sm"
+                        bg={'blue.300'}
+                        color={'white'}
+                      >
+                        Buscar Cep
+                      </Button>
+                    }
+                  />
                 </HStack>
                 <HStack width={'50%'}>
                   <Input label={'Cidade'} name={'cidadenome'} />
@@ -77,7 +117,12 @@ const PointsForm = () => {
               <Button bg={'red.400'} color={'white'} minWidth={150}>
                 Cancelar
               </Button>
-              <Button bg={'green.400'} color={'white'} minWidth={150}>
+              <Button
+                bg={'green.400'}
+                color={'white'}
+                minWidth={150}
+                type="submit"
+              >
                 Salvar
               </Button>
             </HStack>
