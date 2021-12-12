@@ -75,4 +75,4 @@ export const LocationsProvider = ({ children }: LocationsProviderProps) => {
   )
 }
 
-export const useHoldings = () => useContext(LocationsContext)
+export const useLocations = () => useContext(LocationsContext)

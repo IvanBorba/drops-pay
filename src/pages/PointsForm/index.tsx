@@ -14,7 +14,9 @@ import { useFormik, Form, FormikProvider } from 'formik'
 
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
-import { apiCnpj } from '../../services'
+import { useLocations } from '../../contexts/locations'
+import { apiCnpj, apiWS } from '../../services'
+import removeEspecialCharacter from '../../utils/removeEspecialCharacter'
 
 interface ICNPJResponse {
   message: string
@@ -31,8 +33,121 @@ interface ICNPJResponse {
   municipio: string
 }
 
+interface IFormValues {
+  cnpj: string
+  razaosocial: string
+  cep: string
+  logradouro: string
+  numero: string
+  complemento: string
+  cidadenome: string
+  bairro: string
+  ufnome: string
+  ativo: boolean
+}
+
+interface IPointsOfSale {
+  updatekind: number
+  id: number
+  cnpj: string
+  razaosocial: string
+  cep: string
+  logradouro: string
+  numero: number
+  complemento: string
+  cidadeid: number
+  cidadenome: string
+  bairroid: number
+  uf: string
+  ufnome: string
+  ativo: boolean
+  latitude: number
+  longitude: number
+  inputedbygps: boolean
+}
+
 const PointsForm = () => {
   const [isLoading, setIsLoading] = useState(false)
+
+  const { cities, states } = useLocations()
+  const toast = useToast()
+
+  const createPointOfSale = async (data: IPointsOfSale[]) => {
+    try {
+      const { status } = await apiWS.post('/WSPontoVenda', data)
+      if (status === 200) {
+        toast({
+          title: 'Ponto de vendas cadastrado com sucesso.',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+    } catch {
+      toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const onSubmit = async (values: IFormValues) => {
+    setIsLoading(true)
+
+    const {
+      ativo,
+      // bairro,
+      cep,
+      cidadenome,
+      cnpj,
+      complemento,
+      logradouro,
+      numero,
+      razaosocial,
+      ufnome,
+    } = values
+
+    const citie = cities.find(
+      (citie) =>
+        removeEspecialCharacter(citie.nome) ===
+        removeEspecialCharacter(values.cidadenome)
+    )
+    console.log(citie)
+
+    if (citie) {
+      const state = states.find((state) => state.id === parseInt(citie?.uf))
+      console.log(state)
+      if (state) {
+        const data: IPointsOfSale[] = [
+          {
+            updatekind: 1,
+            id: 0,
+            cnpj,
+            razaosocial,
+            cep,
+            logradouro,
+            numero: parseInt(numero),
+            complemento,
+            cidadeid: citie?.id,
+            cidadenome,
+            bairroid: 0,
+            uf: state?.uf,
+            ufnome,
+            ativo,
+            latitude: 1,
+            longitude: 1,
+            inputedbygps: false,
+          },
+        ]
+
+        await createPointOfSale(data)
+      }
+    }
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -48,10 +163,9 @@ const PointsForm = () => {
       ativo: true,
     },
     // eslint-disable-next-line no-console
-    onSubmit: (values) => console.log(values),
+    onSubmit,
   })
 
-  const toast = useToast()
   const getCompanyData = async () => {
     setIsLoading(true)
     try {
@@ -93,7 +207,7 @@ const PointsForm = () => {
         razaosocial: nome,
       })
     } catch {
-      return toast({
+      toast({
         title: 'Ocorreu um erro ao processar sua requisiçao.',
         status: 'error',
         duration: 5000,
