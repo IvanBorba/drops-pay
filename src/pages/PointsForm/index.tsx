@@ -10,12 +10,13 @@ import {
   VStack,
 } from '@chakra-ui/layout'
 import { useToast } from '@chakra-ui/react'
+import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
 
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
 import { useLocations } from '../../contexts/locations'
-import { apiCnpj, apiWS } from '../../services'
+import { apiCep, apiCnpj, apiWS } from '../../services'
 import removeEspecialCharacter from '../../utils/removeEspecialCharacter'
 
 interface ICNPJResponse {
@@ -66,6 +67,17 @@ interface IPointsOfSale {
   inputedbygps: boolean
 }
 
+interface IEstadoInfo {
+  nome: string
+}
+
+interface ILocationResponse {
+  bairro: string
+  cep: string
+  cidade: string
+  estado_info: IEstadoInfo
+  logradouro: string
+}
 const PointsForm = () => {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -74,7 +86,10 @@ const PointsForm = () => {
 
   const createPointOfSale = async (data: IPointsOfSale[]) => {
     try {
-      const { status } = await apiWS.post('/WSPontoVenda', data)
+      const {
+        status,
+        data: { message, httpstatus },
+      } = await apiWS.post('/WSPontoVenda', data)
       if (status === 200) {
         toast({
           title: 'Ponto de vendas cadastrado com sucesso.',
@@ -83,8 +98,25 @@ const PointsForm = () => {
           isClosable: true,
         })
       }
-    } catch {
-      toast({
+      if (httpstatus === 400) {
+        toast({
+          title: message,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+    } catch (e) {
+      const error = e as AxiosError
+      if (error?.response?.data.message) {
+        return toast({
+          title: error?.response?.data.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+      return toast({
         title: 'Ocorreu um erro ao processar sua requisiçao.',
         status: 'error',
         duration: 5000,
@@ -111,16 +143,15 @@ const PointsForm = () => {
       ufnome,
     } = values
 
-    const citie = cities.find(
-      (citie) =>
+    const citie = cities.find((citie) => {
+      return (
         removeEspecialCharacter(citie.nome) ===
         removeEspecialCharacter(values.cidadenome)
-    )
-    console.log(citie)
+      )
+    })
 
     if (citie) {
       const state = states.find((state) => state.id === parseInt(citie?.uf))
-      console.log(state)
       if (state) {
         const data: IPointsOfSale[] = [
           {
@@ -128,7 +159,7 @@ const PointsForm = () => {
             id: 0,
             cnpj,
             razaosocial,
-            cep,
+            cep: cep.replace('.', '').replace('-', ''),
             logradouro,
             numero: parseInt(numero),
             complemento,
@@ -218,6 +249,39 @@ const PointsForm = () => {
     }
   }
 
+  const getLocationData = async () => {
+    setIsLoading(true)
+    try {
+      const {
+        data: { bairro, cidade, estado_info, logradouro },
+      } = await apiCep.get<ILocationResponse>(
+        formik.values.cep.replace('.', '').replace('-', '')
+      )
+
+      formik.setValues({
+        ufnome: estado_info.nome,
+        cep: formik.values.cep,
+        cidadenome: cidade,
+        ativo: true,
+        bairro,
+        cnpj: formik.values.cnpj,
+        complemento: formik.values.complemento,
+        logradouro,
+        numero: formik.values.numero,
+        razaosocial: formik.values.razaosocial,
+      })
+    } catch {
+      toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <Box padding={{ xl: '20', md: '6', lg: '8' }}>
       <Loading isLoading={isLoading} />
@@ -262,17 +326,18 @@ const PointsForm = () => {
               <HStack width={'100%'} spacing={'8'}>
                 <HStack width={'50%'} alignItems={'flex-end'}>
                   <Input
-                    pr={160}
+                    pr={110}
                     label={'Cep'}
                     name={'cep'}
                     rightElement={
                       <Button
-                        minWidth={150}
+                        minWidth={100}
                         size="sm"
                         bg={'blue.300'}
                         color={'white'}
+                        onClick={getLocationData}
                       >
-                        Buscar Cep
+                        Preencher
                       </Button>
                     }
                   />
