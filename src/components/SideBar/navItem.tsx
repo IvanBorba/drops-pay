@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { IconType } from 'react-icons'
 
-import { Box, Flex, Text } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 
 interface IProps {
   Icon: IconType
@@ -9,6 +10,8 @@ interface IProps {
 }
 
 const NavItem = ({ Icon, title, description }: IProps) => {
+  const [bgComponents, setBgComponents] = useState<string>('tomato')
+
   return (
     <Flex
       w="100%"
@@ -21,7 +24,8 @@ const NavItem = ({ Icon, title, description }: IProps) => {
     >
       <Flex
         bg="rgba(201, 69, 46, 0.3)"
-        _hover={{ bg: 'rgba(201, 69, 46, 1)' }}
+        onMouseOver={() => setBgComponents('rgba(201, 69, 46, 1)')}
+        onMouseOut={() => setBgComponents('tomato')}
         borderRadius="50"
         w={50}
         h={50}
@@ -29,9 +33,7 @@ const NavItem = ({ Icon, title, description }: IProps) => {
         justifyContent="center"
         role="icon"
       >
-        <Box>
-          <Icon />
-        </Box>
+        <Icon color={bgComponents} />
       </Flex>
       <Flex w="80%" flexDirection="column" textAlign="justify">
         <Text ml="0.5rem" fontSize="sm" letterSpacing="1px" fontWeight="bold">
