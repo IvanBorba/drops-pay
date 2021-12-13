@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import InputMask from 'react-input-mask'
 
 import {
   FormControl,
@@ -9,6 +10,7 @@ import {
   InputGroup,
   InputRightElement,
   Switch,
+  SimpleGrid,
 } from '@chakra-ui/react'
 import { useField } from 'formik'
 
@@ -18,6 +20,7 @@ interface IInputProps extends InputProps {
   width?: string | number
   rightElement?: ReactNode
   variant?: 'switch' | 'input'
+  mask?: string | Array<string | RegExp>
 }
 
 export const Input = ({
@@ -27,17 +30,26 @@ export const Input = ({
   rightElement,
   pr,
   variant = 'input',
+  mask,
   ...rest
 }: IInputProps) => {
   const [field, meta] = useField(name)
 
   const variants = {
-    input: <ChackraInput {...rest} {...field} id={field.name} />,
+    input: (
+      <ChackraInput
+        as={InputMask}
+        mask={mask}
+        {...rest}
+        {...field}
+        id={field.name}
+      />
+    ),
     switch: <Switch isChecked={field.value} {...field} id={field.name} />,
   }
 
   return (
-    <FormControl width={width}>
+    <FormControl width={width} isInvalid={meta.touched && !!meta.error}>
       <FormLabel htmlFor={field.name}>{label}</FormLabel>
       <InputGroup>
         {variants[variant]}
@@ -47,9 +59,9 @@ export const Input = ({
           </InputRightElement>
         )}
       </InputGroup>
-      {meta.error && meta.touched && (
+      <SimpleGrid minHeight={'8'}>
         <FormErrorMessage>{meta.error}</FormErrorMessage>
-      )}
+      </SimpleGrid>
     </FormControl>
   )
 }

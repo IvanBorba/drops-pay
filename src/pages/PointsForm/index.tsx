@@ -12,6 +12,7 @@ import {
 import { useToast } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
+import * as yup from 'yup'
 
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
@@ -78,6 +79,35 @@ interface ILocationResponse {
   estado_info: IEstadoInfo
   logradouro: string
 }
+
+const schema = yup.object().shape({
+  cnpj: yup
+    .string()
+    .test('len', 'CNPJ inválido', (val) => {
+      if (val) {
+        const len = removeEspecialCharacter(val as string).length
+        return len === 14
+      }
+      return false
+    })
+    .required('Campo obrigatório.'),
+  razaosocial: yup.string().required('Campo obrigatório.'),
+  cep: yup
+    .string()
+    .test('len', 'Cep inválido', (val) => {
+      if (val) {
+        const len = removeEspecialCharacter(val as string).length
+        return len === 8
+      }
+      return false
+    })
+    .required('Campo obrigatório.'),
+  logradouro: yup.string().required('Campo obrigatório.'),
+  numero: yup.string().required('Campo obrigatório.'),
+  cidadenome: yup.string().required('Campo obrigatório.'),
+  bairro: yup.string().required('Campo obrigatório.'),
+  ufnome: yup.string().required('Campo obrigatório.'),
+})
 const PointsForm = () => {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -159,7 +189,7 @@ const PointsForm = () => {
             id: 0,
             cnpj,
             razaosocial,
-            cep: cep.replace('.', '').replace('-', ''),
+            cep: removeEspecialCharacter(cep),
             logradouro,
             numero: parseInt(numero),
             complemento,
@@ -193,7 +223,7 @@ const PointsForm = () => {
       ufnome: '',
       ativo: true,
     },
-    // eslint-disable-next-line no-console
+    validationSchema: schema,
     onSubmit,
   })
 
@@ -215,7 +245,9 @@ const PointsForm = () => {
           // telefone,
           uf,
         },
-      } = await apiCnpj.get<ICNPJResponse>(formik.values.cnpj)
+      } = await apiCnpj.get<ICNPJResponse>(
+        removeEspecialCharacter(formik.values.cnpj)
+      )
       if (status === 'ERROR') {
         return toast({
           title: message,
@@ -255,7 +287,7 @@ const PointsForm = () => {
       const {
         data: { bairro, cidade, estado_info, logradouro },
       } = await apiCep.get<ILocationResponse>(
-        formik.values.cep.replace('.', '').replace('-', '')
+        removeEspecialCharacter(formik.values.cep)
       )
 
       formik.setValues({
@@ -272,7 +304,8 @@ const PointsForm = () => {
       })
     } catch {
       toast({
-        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        title:
+          'Ocorreu um erro ao processar sua requisiçao. Favor verique seu Cep.',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -298,6 +331,7 @@ const PointsForm = () => {
                 <HStack alignItems={'flex-end'} width={'50%'}>
                   <Input
                     pr={110}
+                    mask={'99.999.999/9999-99'}
                     label={'Cnpj'}
                     name={'cnpj'}
                     rightElement={
@@ -328,6 +362,7 @@ const PointsForm = () => {
                   <Input
                     pr={110}
                     label={'Cep'}
+                    mask={'99.999-999'}
                     name={'cep'}
                     rightElement={
                       <Button
