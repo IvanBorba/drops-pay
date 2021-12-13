@@ -16,7 +16,7 @@ import { useField } from 'formik'
 
 interface IInputProps extends InputProps {
   name: string
-  label: string
+  label?: string
   width?: string | number
   rightElement?: ReactNode
   variant?: 'switch' | 'input'
