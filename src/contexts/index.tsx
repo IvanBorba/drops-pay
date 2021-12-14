@@ -1,4 +1,5 @@
 import { ReactNode } from 'react'
+import { BrowserRouter } from 'react-router-dom'
 
 import { ChakraProvider } from '@chakra-ui/react'
 
@@ -13,13 +14,15 @@ interface ProvidersProps {
 
 const Providers = ({ children }: ProvidersProps) => {
   return (
-    <ChakraProvider theme={theme}>
-      <LocationsProvider>
-        <CompaniesProvider>
-          <PointsOfSaleProvider>{children}</PointsOfSaleProvider>
-        </CompaniesProvider>
-      </LocationsProvider>
-    </ChakraProvider>
+    <BrowserRouter>
+      <ChakraProvider theme={theme}>
+        <LocationsProvider>
+          <CompaniesProvider>
+            <PointsOfSaleProvider>{children}</PointsOfSaleProvider>
+          </CompaniesProvider>
+        </LocationsProvider>
+      </ChakraProvider>
+    </BrowserRouter>
   )
 }
 
