@@ -7,13 +7,33 @@ interface IProps {
   Icon: IconType
   title: string
   description: string
+  serviceNumber: number
+  onClick: () => void
 }
 
-const NavItem = ({ Icon, title, description }: IProps) => {
-  const [bgComponents, setBgComponents] = useState<string>('tomato')
+const NavItem = ({
+  Icon,
+  title,
+  description,
+  serviceNumber,
+  onClick,
+}: IProps) => {
+  const [bgColor, setBgColor] = useState<string>(`service${serviceNumber}.50`)
+  const [iconColor, setIconColor] = useState<string>(
+    serviceNumber === 1
+      ? '#0AB2BF'
+      : serviceNumber === 2
+      ? '#E8D55D'
+      : serviceNumber === 3
+      ? '#12B886'
+      : serviceNumber === 4
+      ? '#FE7E7E'
+      : '#7B61FF'
+  )
 
   return (
     <Flex
+      onClick={onClick}
       w="100%"
       height="8vh"
       border="0.5px solid #F8F9FA"
@@ -21,11 +41,29 @@ const NavItem = ({ Icon, title, description }: IProps) => {
       pl="1vw"
       py="1vh"
       alignItems="center"
+      mb="3.3rem"
+      cursor="pointer"
+      onMouseOver={() => {
+        setBgColor(`service${serviceNumber}.100`)
+        setIconColor('white')
+      }}
+      onMouseOut={() => {
+        setBgColor(`service${serviceNumber}.50`)
+        setIconColor(
+          serviceNumber === 1
+            ? '#0AB2BF'
+            : serviceNumber === 2
+            ? '#E8D55D'
+            : serviceNumber === 3
+            ? '#12B886'
+            : serviceNumber === 4
+            ? '#FE7E7E'
+            : '#7B61FF'
+        )
+      }}
     >
       <Flex
-        bg="rgba(201, 69, 46, 0.3)"
-        onMouseOver={() => setBgComponents('rgba(201, 69, 46, 1)')}
-        onMouseOut={() => setBgComponents('tomato')}
+        bg={bgColor}
         borderRadius="50"
         w={50}
         h={50}
@@ -33,7 +71,7 @@ const NavItem = ({ Icon, title, description }: IProps) => {
         justifyContent="center"
         role="icon"
       >
-        <Icon color={bgComponents} />
+        <Icon color={iconColor} />
       </Flex>
       <Flex w="80%" flexDirection="column" textAlign="justify">
         <Text ml="0.5rem" fontSize="sm" letterSpacing="1px" fontWeight="bold">
