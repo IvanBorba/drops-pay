@@ -9,7 +9,7 @@ import {
   SimpleGrid,
   VStack,
 } from '@chakra-ui/layout'
-import { useToast } from '@chakra-ui/react'
+import { useBreakpointValue, useToast } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
 import * as yup from 'yup'
@@ -310,6 +310,11 @@ const BenefitsForm = () => {
     }
   }
 
+  const templateColumns = useBreakpointValue({
+    lg: '4fr',
+    '2xl': '2fr 2fr',
+  })
+
   return (
     <Box padding={{ xl: '20', md: '6', lg: '8' }}>
       <Loading isLoading={isLoading} />
@@ -344,8 +349,12 @@ const BenefitsForm = () => {
                 </HStack>
               </HStack>
             </VStack>
-            <HStack spacing={'8'}>
-              <VStack spacing={'2'} width={'50%'}>
+            <SimpleGrid
+              spacing={'8'}
+              flexDirection={'column'}
+              gridTemplateColumns={templateColumns}
+            >
+              <VStack spacing={'2'}>
                 <HStack width={'100%'}>
                   <Heading
                     fontWeight={'normal'}
@@ -394,7 +403,7 @@ const BenefitsForm = () => {
                   </HStack>
                 </HStack>
               </VStack>
-              <VStack spacing={'2'} width={'50%'}>
+              <VStack spacing={'2'}>
                 <HStack width={'100%'}>
                   <Heading
                     fontWeight={'normal'}
@@ -443,7 +452,7 @@ const BenefitsForm = () => {
                   </HStack>
                 </HStack>
               </VStack>
-            </HStack>
+            </SimpleGrid>
 
             <HStack justifyContent={'space-between'}>
               <Button bg={'red.400'} color={'white'} minWidth={150}>
