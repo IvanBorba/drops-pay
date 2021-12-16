@@ -58,4 +58,4 @@ export const CompaniesProvider = ({ children }: CompaniesProviderProps) => {
   )
 }
 
-export const useHoldings = () => useContext(CompaniesContext)
+export const useCompanies = () => useContext(CompaniesContext)
