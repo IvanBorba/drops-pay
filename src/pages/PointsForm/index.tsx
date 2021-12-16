@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@chakra-ui/button'
 import {
@@ -110,6 +111,8 @@ const schema = yup.object().shape({
 })
 const PointsForm = () => {
   const [isLoading, setIsLoading] = useState(false)
+
+  const navigate = useNavigate()
 
   const { cities, states } = useLocations()
   const toast = useToast()
@@ -407,7 +410,12 @@ const PointsForm = () => {
               </HStack>
             </VStack>
             <HStack justifyContent={'space-between'}>
-              <Button bg={'red.400'} color={'white'} minWidth={150}>
+              <Button
+                bg={'red.400'}
+                color={'white'}
+                minWidth={150}
+                onClick={() => navigate(-1)}
+              >
                 Cancelar
               </Button>
               <Button

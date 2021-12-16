@@ -34,6 +34,10 @@ export const theme = extendTheme({
       100: '#7B61FF',
       50: '#F2F0FF',
     },
+    table: {
+      50: 'white',
+      100: '#F8F9FA',
+    },
     fonts: {
       heading: 'Inter',
       body: 'Inter',

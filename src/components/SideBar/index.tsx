@@ -23,7 +23,7 @@ const SideBar = () => {
         />
         <NavItem
           Icon={HiDocument}
-          title="Grupos de empresa"
+          title="Grupos de empresas"
           description="Crie e visualize os seus grupos"
           serviceNumber={2}
           onClick={() => navigate('/grupos-de-empresas')}
