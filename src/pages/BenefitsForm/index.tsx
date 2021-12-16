@@ -20,61 +20,29 @@ import { useLocations } from '../../contexts/locations'
 import { apiCep, apiCnpj, apiWS } from '../../services'
 import removeEspecialCharacter from '../../utils/removeEspecialCharacter'
 
-interface ICNPJResponse {
-  message: string
-  status: string
-  complemento: string
-  nome: string
-  uf: string
-  telefone: string
-  email: string
-  bairro: string
-  logradouro: string
-  numero: string
-  cep: string
-  municipio: string
+interface IProducts {
+  uid: string
 }
 
-interface IFormValues {
-  cnpj: string
-  razaosocial: string
-  cep: string
-  logradouro: string
-  numero: string
-  complemento: string
-  cidadenome: string
-  bairro: string
-  ufnome: string
-  ativo: boolean
-}
-
-interface IPointsOfSale {
-  updatekind: number
-  id: number
-  cnpj: string
-  razaosocial: string
-  cep: string
-  logradouro: string
-  numero: number
-  complemento: string
-  cidadeid: number
-  cidadenome: string
-  bairroid: number
-  uf: string
-  ufnome: string
-  ativo: boolean
-}
-
-interface IEstadoInfo {
-  nome: string
-}
-
-interface ILocationResponse {
-  bairro: string
-  cep: string
-  cidade: string
-  estado_info: IEstadoInfo
-  logradouro: string
+interface IBenefitsForm {
+  grupoclientesdescricao: string
+  descricao: string
+  isauferirpontosenabled: boolean
+  referencia: string
+  proporcao: string
+  auferirpontos: string
+  vigenciainicial: string
+  vigenciafinal: string
+  validadepontos: string
+  desprezarfracao: boolean
+  isconcederdescontoenabled: boolean
+  referenciadesconto: string
+  auferirdesconto: string
+  isvalorcashbackenabled: boolean
+  referenciacashback: string
+  auferircashback: string
+  ativo: true
+  itensvinculados: IProducts[]
 }
 
 const schema = yup.object().shape({
@@ -207,16 +175,24 @@ const BenefitsForm = () => {
 
   const formik = useFormik({
     initialValues: {
-      cnpj: '',
-      razaosocial: '',
-      cep: '',
-      logradouro: '',
-      numero: '',
-      complemento: '',
-      cidadenome: '',
-      bairro: '',
-      ufnome: '',
+      grupoclientesdescricao: '',
+      descricao: '',
+      isauferirpontosenabled: false,
+      referencia: '',
+      proporcao: '',
+      auferirpontos: '',
+      vigenciainicial: '',
+      vigenciafinal: '',
+      validadepontos: '',
+      desprezarfracao: false,
+      isconcederdescontoenabled: false,
+      referenciadesconto: '',
+      auferirdesconto: '',
+      isvalorcashbackenabled: false,
+      referenciacashback: '',
+      auferircashback: '',
       ativo: true,
+      itensvinculados: [],
     },
     validationSchema: schema,
     onSubmit,
@@ -329,11 +305,7 @@ const BenefitsForm = () => {
               <Divider />
               <HStack width={'100%'} spacing={'8'}>
                 <HStack alignItems={'flex-end'} width={'50%'}>
-                  <Input
-                    pr={110}
-                    label={'Nome do produto'}
-                    name={'descricao'}
-                  />
+                  <Input pr={110} label={'Descrição'} name={'descricao'} />
                 </HStack>
                 <HStack width={'50%'}>
                   <Input
