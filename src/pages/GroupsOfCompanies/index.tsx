@@ -7,6 +7,7 @@ import Button from '../../components/Button'
 import SearchInput from '../../components/SearchInput'
 import Table from '../../components/Table'
 import { useCompanies } from '../../contexts/companies'
+import removeEspecialCharacter from '../../utils/removeEspecialCharacter'
 
 interface Company {
   ativo: boolean
@@ -68,7 +69,7 @@ const GroupsOfCompanies = () => {
         <SearchInput
           text="Buscar por Razão Social"
           onChange={(e) => {
-            setNameFilter(e.target.value)
+            setNameFilter(removeEspecialCharacter(e.target.value))
             setCnpjFilter('')
           }}
           value={nameFilter}
@@ -76,10 +77,11 @@ const GroupsOfCompanies = () => {
         <SearchInput
           text="Buscar por CNPJ"
           onChange={(e) => {
-            setCnpjFilter(e.target.value)
+            setCnpjFilter(removeEspecialCharacter(e.target.value))
             setNameFilter('')
           }}
           value={cnpjFilter}
+          cnpj
         />
       </Flex>
       <Table

@@ -1,5 +1,6 @@
 import { ChangeEvent } from 'react'
 import { FaSearch } from 'react-icons/fa'
+import InputMask from 'react-input-mask'
 
 import { Input, InputGroup } from '@chakra-ui/react'
 
@@ -7,9 +8,10 @@ interface IProps {
   text: string
   onChange: (e: ChangeEvent<HTMLInputElement>) => void
   value: string
+  cnpj?: boolean
 }
 
-const SearchInput = ({ text, onChange, value }: IProps) => {
+const SearchInput = ({ text, onChange, value, cnpj = false }: IProps) => {
   return (
     <InputGroup
       backgroundColor="grey.300"
@@ -21,6 +23,8 @@ const SearchInput = ({ text, onChange, value }: IProps) => {
     >
       <FaSearch />
       <Input
+        as={InputMask}
+        mask={cnpj ? '99.999.999/9999-99' : ''}
         placeholder={text}
         onChange={onChange}
         variant="unstyled"
