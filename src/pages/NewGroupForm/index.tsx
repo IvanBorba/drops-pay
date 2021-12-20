@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@chakra-ui/button'
 import {
@@ -108,6 +109,8 @@ const schema = yup.object().shape({
 
 const NewGroupForm = () => {
   const [isLoading, setIsLoading] = useState(false)
+
+  const navigate = useNavigate()
 
   const { cities, states } = useLocations()
   const toast = useToast()
@@ -319,7 +322,7 @@ const NewGroupForm = () => {
           <SimpleGrid spacing={'6'} maxWidth={1280} margin={'0 auto'}>
             <VStack spacing={'2'}>
               <Heading fontWeight={'normal'} size={'lg'} alignSelf={'start'}>
-                Informações do ponto
+                Informações do grupo de empresas
               </Heading>
               <Divider />
               <HStack width={'100%'} spacing={'8'}>
@@ -402,7 +405,12 @@ const NewGroupForm = () => {
               </HStack>
             </VStack>
             <HStack justifyContent={'space-between'}>
-              <Button bg={'red.400'} color={'white'} minWidth={150}>
+              <Button
+                bg={'red.400'}
+                color={'white'}
+                minWidth={150}
+                onClick={() => navigate(-1)}
+              >
                 Cancelar
               </Button>
               <Button

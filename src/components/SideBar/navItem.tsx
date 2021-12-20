@@ -41,8 +41,21 @@ const NavItem = ({
       pl="1vw"
       py="1vh"
       alignItems="center"
-      mb="3.3rem"
+      mt="2.3rem"
       cursor="pointer"
+      _hover={{
+        border: `0.5px solid ${
+          serviceNumber === 1
+            ? '#0AB2BF'
+            : serviceNumber === 2
+            ? '#E8D55D'
+            : serviceNumber === 3
+            ? '#12B886'
+            : serviceNumber === 4
+            ? '#FE7E7E'
+            : '#7B61FF'
+        }`,
+      }}
       onMouseOver={() => {
         setBgColor(`service${serviceNumber}.100`)
         setIconColor('white')

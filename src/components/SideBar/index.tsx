@@ -1,7 +1,7 @@
 import { HiDocument } from 'react-icons/hi'
 import { useNavigate } from 'react-router-dom'
 
-import { Box, Divider, Flex, Image } from '@chakra-ui/react'
+import { Box, Flex, Image } from '@chakra-ui/react'
 
 import logo from '../../assets/images/logo.png'
 import NavItem from './navItem'
@@ -10,18 +10,8 @@ const SideBar = () => {
   const navigate = useNavigate()
   return (
     <Box minH="100vh">
-      <Flex
-        h="157"
-        alignItems="center"
-        pl="9rem"
-        pr="11rem"
-        py="5vh"
-        bg="#F8F9FA"
-      >
-        <Image src={logo} alt="Logo" />
-      </Flex>
-      <Flex justifyContent="center" mb="8vh">
-        <Divider w="85%" />
+      <Flex h="157" alignItems="center" justifyContent="center" bg="#F8F9FA">
+        <Image src={logo} alt="Logo" w="157px" />
       </Flex>
       <Flex flexDirection="column" px="2vw">
         <NavItem
@@ -33,7 +23,7 @@ const SideBar = () => {
         />
         <NavItem
           Icon={HiDocument}
-          title="Grupos de empresa"
+          title="Grupos de empresas"
           description="Crie e visualize os seus grupos"
           serviceNumber={2}
           onClick={() => navigate('/grupos-de-empresas')}
