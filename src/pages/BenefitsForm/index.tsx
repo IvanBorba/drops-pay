@@ -11,15 +11,11 @@ import {
   VStack,
 } from '@chakra-ui/layout'
 import { useBreakpointValue, useToast } from '@chakra-ui/react'
-import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
 import * as yup from 'yup'
 
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
-import { useLocations } from '../../contexts/locations'
-import { apiCep, apiCnpj, apiWS } from '../../services'
-import removeEspecialCharacter from '../../utils/removeEspecialCharacter'
 
 interface IProducts {
   uid: string
@@ -46,134 +42,18 @@ interface IBenefitsForm {
   itensvinculados: IProducts[]
 }
 
-const schema = yup.object().shape({
-  cnpj: yup
-    .string()
-    .test('len', 'CNPJ inválido', (val) => {
-      if (val) {
-        const len = removeEspecialCharacter(val as string).length
-        return len === 14
-      }
-      return false
-    })
-    .required('Campo obrigatório.'),
-  razaosocial: yup.string().required('Campo obrigatório.'),
-  cep: yup
-    .string()
-    .test('len', 'Cep inválido', (val) => {
-      if (val) {
-        const len = removeEspecialCharacter(val as string).length
-        return len === 8
-      }
-      return false
-    })
-    .required('Campo obrigatório.'),
-  logradouro: yup.string().required('Campo obrigatório.'),
-  numero: yup.string().required('Campo obrigatório.'),
-  cidadenome: yup.string().required('Campo obrigatório.'),
-  bairro: yup.string().required('Campo obrigatório.'),
-  ufnome: yup.string().required('Campo obrigatório.'),
-})
+const schema = yup.object().shape({})
 
 const BenefitsForm = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const navigate = useNavigate()
 
-  const { cities, states } = useLocations()
   const toast = useToast()
 
-  const createGroup = async (data: IPointsOfSale[]) => {
-    try {
-      const {
-        status,
-        data: { message, httpstatus },
-      } = await apiWS.post('/WSEmpresaControladora', data)
-      if (status === 200) {
-        toast({
-          title: 'Empresa cadastrada com sucesso.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        })
-      }
-      if (httpstatus === 400) {
-        toast({
-          title: message,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        })
-      }
-    } catch (e) {
-      const error = e as AxiosError
-      if (error?.response?.data.message) {
-        return toast({
-          title: error?.response?.data.message,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        })
-      }
-      return toast({
-        title: 'Ocorreu um erro ao processar sua requisiçao.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const onSubmit = async (values: IFormValues) => {
+  const onSubmit = async (values: IBenefitsForm) => {
     setIsLoading(true)
-
-    const {
-      ativo,
-      // bairro,
-      cep,
-      cidadenome,
-      cnpj,
-      complemento,
-      logradouro,
-      numero,
-      razaosocial,
-      ufnome,
-    } = values
-
-    const citie = cities.find((citie) => {
-      return (
-        removeEspecialCharacter(citie.nome) ===
-        removeEspecialCharacter(values.cidadenome)
-      )
-    })
-
-    if (citie) {
-      const state = states.find((state) => state.id === parseInt(citie?.uf))
-      if (state) {
-        const data: IPointsOfSale[] = [
-          {
-            updatekind: 1,
-            id: 0,
-            cnpj,
-            razaosocial,
-            cep: removeEspecialCharacter(cep),
-            logradouro,
-            numero: parseInt(numero),
-            complemento,
-            cidadeid: citie?.id,
-            cidadenome,
-            bairroid: 0,
-            uf: state?.uf,
-            ufnome,
-            ativo,
-          },
-        ]
-
-        await createGroup(data)
-      }
-    }
+    return
   }
 
   const formik = useFormik({
@@ -200,94 +80,6 @@ const BenefitsForm = () => {
     validationSchema: schema,
     onSubmit,
   })
-
-  const getCompanyData = async () => {
-    setIsLoading(true)
-    try {
-      const {
-        data: {
-          status,
-          message,
-          bairro,
-          cep,
-          complemento,
-          // email,
-          logradouro,
-          municipio,
-          nome,
-          numero,
-          // telefone,
-          uf,
-        },
-      } = await apiCnpj.get<ICNPJResponse>(
-        removeEspecialCharacter(formik.values.cnpj)
-      )
-      if (status === 'ERROR') {
-        return toast({
-          title: message,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        })
-      }
-
-      formik.setValues({
-        ufnome: uf,
-        cep,
-        cidadenome: municipio,
-        ativo: true,
-        bairro,
-        cnpj: formik.values.cnpj,
-        complemento: complemento,
-        logradouro,
-        numero: numero,
-        razaosocial: nome,
-      })
-    } catch {
-      toast({
-        title: 'Ocorreu um erro ao processar sua requisiçao.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const getLocationData = async () => {
-    setIsLoading(true)
-    try {
-      const {
-        data: { bairro, cidade, estado_info, logradouro },
-      } = await apiCep.get<ILocationResponse>(
-        removeEspecialCharacter(formik.values.cep)
-      )
-
-      formik.setValues({
-        ufnome: estado_info.nome,
-        cep: formik.values.cep,
-        cidadenome: cidade,
-        ativo: true,
-        bairro,
-        cnpj: formik.values.cnpj,
-        complemento: formik.values.complemento,
-        logradouro,
-        numero: formik.values.numero,
-        razaosocial: formik.values.razaosocial,
-      })
-    } catch {
-      toast({
-        title:
-          'Ocorreu um erro ao processar sua requisiçao. Favor verique seu Cep.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   const templateColumns = useBreakpointValue({
     lg: '4fr',
@@ -339,42 +131,43 @@ const BenefitsForm = () => {
                   >
                     Descontos
                   </Heading>
-                  <Input variant="switch" name={'isauferirpontosenabled'} />
+                  <Input variant="switch" name={'isconcederdescontoenabled'} />
                 </HStack>
                 <Divider />
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
-                    <Input pr={110} label={'Referencia'} name={'referencia'} />
+                    <Input
+                      pr={110}
+                      label={'Referencia'}
+                      name={'referenciadesconto'}
+                    />
                   </HStack>
                   <HStack width={'50%'}>
-                    <Input label={'Proporção'} name={'proporcao'} />
+                    <Input label={'Desconto'} name={'auferirdesconto'} />
                   </HStack>
                 </HStack>
+                <HStack width={'100%'}>
+                  <Heading
+                    fontWeight={'normal'}
+                    size={'lg'}
+                    alignSelf={'start'}
+                    pr={'2'}
+                  >
+                    Cashback
+                  </Heading>
+                  <Input variant="switch" name={'isvalorcashbackenabled'} />
+                </HStack>
+                <Divider />
                 <HStack width={'100%'} spacing={'8'}>
-                  <HStack width={'50%'}>
+                  <HStack width={'50%'} alignItems={'flex-end'}>
                     <Input
-                      label={'Quantidade de pontos'}
-                      name={'auferirpontos'}
+                      pr={110}
+                      label={'Referencia'}
+                      name={'referenciacashback'}
                     />
                   </HStack>
                   <HStack width={'50%'}>
-                    <Input
-                      label={'Validade dos pontos'}
-                      name={'validadepontos'}
-                    />
-                  </HStack>
-                </HStack>
-                <HStack
-                  width={'100%'}
-                  spacing={'8'}
-                  justifyContent={'flex-start'}
-                >
-                  <HStack width={'50%'}>
-                    <Input
-                      variant="switch"
-                      label={'Desprezar fração no cálculo'}
-                      name={'desprezarfracao'}
-                    />
+                    <Input label={'Cashback'} name={'auferircashback'} />
                   </HStack>
                 </HStack>
               </VStack>
