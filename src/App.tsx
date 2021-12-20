@@ -8,7 +8,7 @@ import AppRoutes from './pages'
 
 export const App = () => (
   <Box textAlign="center" fontSize="xl">
-    <Grid minH="100vh" pr={10} templateColumns={'minmax(20vw, 23.75rem) auto'}>
+    <Grid minH="100vh" pr={10} templateColumns={'minmax(320px, 23.75rem) auto'}>
       <GridItem
         rowSpan={1}
         colSpan={1}

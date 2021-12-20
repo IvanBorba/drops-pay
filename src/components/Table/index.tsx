@@ -37,7 +37,7 @@ interface IProps {
 const Table = ({ data, variant = 'default' }: IProps) => {
   const [headers] = useState<string[]>(
     variant === 'default'
-      ? ['Razão Social', 'CNPJ', 'UF', 'Cidade', 'Endereço', 'Opções']
+      ? ['Status', 'Razão Social', 'CNPJ', 'UF', 'Cidade', 'Endereço', 'Opções']
       : variant === 'products'
       ? ['id', 'Descrição', 'Grupo de Produtos', 'Preço Unitário', 'Opções']
       : [
@@ -83,41 +83,42 @@ const Table = ({ data, variant = 'default' }: IProps) => {
           if (variant === 'default') {
             return (
               <Tr>
-                <Td height="47px">
+                <Td height="47px" width="80px" px="0">
                   {item.ativo === true || item.ativo === 1 ? (
-                    <Flex justifyContent="space-between">
-                      {item.razaosocial}
+                    <Flex justifyContent="center">
                       <Box
                         borderRadius="30px"
                         bg="green.500"
                         width="60px"
+                        minWidth="60px"
                         height="20px"
-                        ml="1rem"
                         fontSize="sm"
                         color="white"
                         textAlign="center"
+                        userSelect="none"
                       >
                         Ativo
                       </Box>
                     </Flex>
                   ) : (
-                    <Flex justifyContent="space-between">
-                      {item.razaosocial}
+                    <Flex justifyContent="center">
                       <Box
                         borderRadius="30px"
                         bg="#F32013"
                         width="60px"
+                        minWidth="60px"
                         height="20px"
-                        ml="1rem"
                         fontSize="sm"
                         color="white"
                         textAlign="center"
+                        userSelect="none"
                       >
                         Inativo
                       </Box>
                     </Flex>
                   )}
                 </Td>
+                <Td height="47px">{item.razaosocial}</Td>
                 <Td>{item.cnpj}</Td>
                 <Td>{item.uf}</Td>
                 <Td>{item.cidadenome}</Td>
