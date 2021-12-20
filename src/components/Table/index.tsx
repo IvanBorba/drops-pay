@@ -85,7 +85,7 @@ const Table = ({ data, variant = 'default' }: IProps) => {
               <Tr>
                 <Td height="47px">
                   {item.ativo === true || item.ativo === 1 ? (
-                    <Flex>
+                    <Flex justifyContent="space-between">
                       {item.razaosocial}
                       <Box
                         borderRadius="30px"
@@ -101,7 +101,7 @@ const Table = ({ data, variant = 'default' }: IProps) => {
                       </Box>
                     </Flex>
                   ) : (
-                    <Flex>
+                    <Flex justifyContent="space-between">
                       {item.razaosocial}
                       <Box
                         borderRadius="30px"
