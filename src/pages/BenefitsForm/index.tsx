@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Button } from '@chakra-ui/button'
 import {
   Box,
   Divider,
@@ -11,11 +10,14 @@ import {
   VStack,
 } from '@chakra-ui/layout'
 import { useBreakpointValue, useToast } from '@chakra-ui/react'
+import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
 import * as yup from 'yup'
 
+import Button from '../../components/Button'
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
+import { apiWS } from '../../services'
 
 interface IProducts {
   uid: string
@@ -42,6 +44,45 @@ interface IBenefitsForm {
   itensvinculados: IProducts[]
 }
 
+interface IItens {
+  uid: string
+  classificacao: string
+  tipo: string
+  tipodescricao: string
+  descricao: string
+}
+
+interface IBenefitsData {
+  id: number
+  pontovendaid: number
+  razaosocial: string
+  grupoclientesid: number
+  grupoclientesdescricao: string
+  descricao: string
+  isauferirpontosenabled: true
+  referencia: string
+  proporcao: number
+  auferirpontos: number
+  vigenciainicial: string
+  vigenciafinal: string
+  validadepontos: number
+  desprezarfracao: boolean
+  isconcederdescontoenabled: boolean
+  referenciadesconto: string
+  auferirdesconto: number
+  isvalorcashbackenabled: boolean
+  referenciacashback: string
+  auferircashback: number
+  ativo: boolean
+  itensvinculados: IItens[]
+}
+
+interface IBenefitsPostResponse {
+  httpstatus: number
+  id: string
+  message: string
+}
+
 const schema = yup.object().shape({})
 
 const BenefitsForm = () => {
@@ -53,7 +94,44 @@ const BenefitsForm = () => {
 
   const onSubmit = async (values: IBenefitsForm) => {
     setIsLoading(true)
-    return
+    try {
+      const {
+        data: { httpstatus, message },
+      } = await apiWS.post<IBenefitsPostResponse>('WSBeneficio', values)
+
+      if (httpstatus === 200) {
+        return toast({
+          title: message,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } catch (e) {
+      const error = e as AxiosError
+      if (error?.response?.data.message) {
+        return toast({
+          title: error?.response?.data.message,
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const formik = useFormik({
@@ -92,7 +170,13 @@ const BenefitsForm = () => {
 
       <FormikProvider value={formik}>
         <Form onSubmit={formik.handleSubmit}>
-          <SimpleGrid spacing={'6'} maxWidth={1280} margin={'0 auto'}>
+          <SimpleGrid
+            spacing={'6'}
+            maxWidth={1280}
+            margin={'0 auto'}
+            boxShadow={'0px 3.45362px 34.5362px rgba(170, 170, 170, 0.25);'}
+            padding={'16'}
+          >
             <VStack spacing={'2'}>
               <Heading fontWeight={'normal'} size={'lg'} alignSelf={'start'}>
                 Informações do ponto
@@ -100,18 +184,25 @@ const BenefitsForm = () => {
               <Divider />
               <HStack width={'100%'} spacing={'8'}>
                 <HStack alignItems={'flex-end'} width={'50%'}>
-                  <Input pr={110} label={'Descrição'} name={'descricao'} />
+                  <Input
+                    pr={110}
+                    label={'Descrição'}
+                    name={'descricao'}
+                    placeholder={'Digite a descrição do benefício.'}
+                  />
                 </HStack>
                 <HStack width={'50%'}>
                   <Input
                     label={'Vigência Inicial'}
                     mask={'99/99/9999'}
                     name={'vigenciainicial'}
+                    placeholder={'Digite a data inicial.'}
                   />
                   <Input
                     label={'Vigência Final'}
                     mask={'99/99/9999'}
                     name={'vigenciafinal'}
+                    placeholder={'Digite a data final.'}
                   />
                 </HStack>
               </HStack>
@@ -137,13 +228,22 @@ const BenefitsForm = () => {
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
                     <Input
+                      chakraVariant="filled"
                       pr={110}
                       label={'Referencia'}
+                      placeholder="Selecione a referencia"
                       name={'referenciadesconto'}
+                      isDisabled={!formik.values.isconcederdescontoenabled}
                     />
                   </HStack>
                   <HStack width={'50%'}>
-                    <Input label={'Desconto'} name={'auferirdesconto'} />
+                    <Input
+                      chakraVariant="filled"
+                      label={'Desconto'}
+                      placeholder="Digite o valor do desconto."
+                      name={'auferirdesconto'}
+                      isDisabled={!formik.values.isconcederdescontoenabled}
+                    />
                   </HStack>
                 </HStack>
                 <HStack width={'100%'}>
@@ -163,11 +263,20 @@ const BenefitsForm = () => {
                     <Input
                       pr={110}
                       label={'Referencia'}
+                      placeholder="Selecione a referencia"
                       name={'referenciacashback'}
+                      chakraVariant="filled"
+                      isDisabled={!formik.values.isvalorcashbackenabled}
                     />
                   </HStack>
                   <HStack width={'50%'}>
-                    <Input label={'Cashback'} name={'auferircashback'} />
+                    <Input
+                      label={'Cashback'}
+                      name={'auferircashback'}
+                      placeholder="Digite o valor do cashback."
+                      chakraVariant="filled"
+                      isDisabled={!formik.values.isvalorcashbackenabled}
+                    />
                   </HStack>
                 </HStack>
               </VStack>
@@ -186,23 +295,43 @@ const BenefitsForm = () => {
                 <Divider />
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
-                    <Input pr={110} label={'Referencia'} name={'referencia'} />
+                    <Input
+                      pr={110}
+                      label={'Referencia'}
+                      name={'referencia'}
+                      chakraVariant="filled"
+                      placeholder="Selecione a referencia"
+                      isDisabled={!formik.values.isauferirpontosenabled}
+                    />
                   </HStack>
                   <HStack width={'50%'}>
-                    <Input label={'Proporção'} name={'proporcao'} />
+                    <Input
+                      label={'Proporção'}
+                      name={'proporcao'}
+                      chakraVariant="filled"
+                      placeholder="Digite aqui a proporção."
+                      isDisabled={!formik.values.isauferirpontosenabled}
+                    />
                   </HStack>
                 </HStack>
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'}>
                     <Input
                       label={'Quantidade de pontos'}
+                      placeholder="Digite a quantidade de pontos."
                       name={'auferirpontos'}
+                      chakraVariant="filled"
+                      isDisabled={!formik.values.isauferirpontosenabled}
                     />
                   </HStack>
                   <HStack width={'50%'}>
                     <Input
                       label={'Validade dos pontos'}
                       name={'validadepontos'}
+                      chakraVariant="filled"
+                      mask={'99/99/9999'}
+                      placeholder="Digite aqui a data de validade."
+                      isDisabled={!formik.values.isauferirpontosenabled}
                     />
                   </HStack>
                 </HStack>
@@ -216,29 +345,15 @@ const BenefitsForm = () => {
                       variant="switch"
                       label={'Desprezar fração no cálculo'}
                       name={'desprezarfracao'}
+                      isDisabled={!formik.values.isauferirpontosenabled}
                     />
                   </HStack>
                 </HStack>
               </VStack>
             </SimpleGrid>
-
-            <HStack justifyContent={'space-between'}>
-              <Button
-                bg={'red.400'}
-                color={'white'}
-                minWidth={150}
-                onClick={() => navigate(-1)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                bg={'green.400'}
-                color={'white'}
-                minWidth={150}
-                type="submit"
-              >
-                Salvar
-              </Button>
+            <HStack justifyContent={'flex-end'}>
+              <Button text="Cancelar" color="gray" />
+              <Button text="Cadastrar" type="submit" />
             </HStack>
           </SimpleGrid>
         </Form>
