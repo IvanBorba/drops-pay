@@ -5,7 +5,7 @@ import { Box, Flex } from '@chakra-ui/react'
 
 import Button from '../../components/Button'
 import SearchInput from '../../components/SearchInput'
-import Table from '../../components/Table'
+import Table from '../../components/Tables/CompaniesAndPointsOfSaleTable'
 import { useCompanies } from '../../contexts/companies'
 import removeEspecialCharacter from '../../utils/removeEspecialCharacter'
 

@@ -2,7 +2,6 @@ import * as React from 'react'
 
 import { Box, Grid, GridItem } from '@chakra-ui/react'
 
-import { ColorModeSwitcher } from './ColorModeSwitcher'
 import SideBar from './components/SideBar'
 import AppRoutes from './pages'
 
@@ -17,8 +16,12 @@ export const App = () => (
       >
         <SideBar />
       </GridItem>
-      <Grid rowSpan={1} colSpan={1} templateRows={'minmax(5vh, 48px) auto'}>
-        <ColorModeSwitcher justifySelf="flex-end" />
+      <Grid
+        rowSpan={1}
+        colSpan={1}
+        templateRows={'minmax(5vh, 48px) auto'}
+        pt="3rem"
+      >
         <AppRoutes />
       </Grid>
     </Grid>

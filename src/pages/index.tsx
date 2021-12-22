@@ -3,11 +3,12 @@ import { Route, Routes } from 'react-router-dom'
 import Benefits from './Benefits'
 import BenefitsForm from './BenefitsForm'
 import Dashboard from './Dashboard'
+import GroupsOfClients from './GroupsOfClients'
 import GroupsOfCompanies from './GroupsOfCompanies'
+import GroupsOfProducts from './GroupsOfProducts'
 import NewGroupForm from './NewGroupForm'
 import PointsForm from './PointsForm'
 import PointsOfSale from './PointsOfSale'
-import Products from './Products'
 
 const AppRoutes = () => {
   return (
@@ -17,7 +18,8 @@ const AppRoutes = () => {
       <Route path="/pontos-de-venda" element={<PointsOfSale />} />
       <Route path="/novo-grupo" element={<NewGroupForm />} />
       <Route path="/grupos-de-empresas" element={<GroupsOfCompanies />} />
-      <Route path="/products" element={<Products />} />
+      <Route path="/grupos-de-clientes" element={<GroupsOfClients />} />
+      <Route path="/produtos" element={<GroupsOfProducts />} />
       <Route path="/beneficios" element={<Benefits />} />
       <Route path="/novo-beneficio" element={<BenefitsForm />} />
     </Routes>

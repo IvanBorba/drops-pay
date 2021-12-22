@@ -37,9 +37,16 @@ const SideBar = () => {
         />
         <NavItem
           Icon={HiDocument}
-          title="Produtos"
-          description="Gerencie os seus produtos"
+          title="Grupos de Clientes"
+          description="Gerencie seus grupos de clientes"
           serviceNumber={4}
+          onClick={() => navigate('/grupos-de-clientes')}
+        />
+        <NavItem
+          Icon={HiDocument}
+          title="Grupos de Produtos"
+          description="Gerencie os seus produtos"
+          serviceNumber={5}
           onClick={() => navigate('/produtos')}
         />
         <NavItem
