@@ -34,7 +34,7 @@ const GroupsOfProducts = () => {
         Grupos de Produtos
       </Text>
       <Flex>
-        <Select data={pointsOfSale} onChange={getGroupsOfProducts} />
+        <Select data={pointsOfSale} handleChange={getGroupsOfProducts} />
       </Flex>
       <Flex>
         <ProductsTable data={pointGroups} />

@@ -34,7 +34,7 @@ const GroupsOfClients = () => {
         Grupos de Clientes
       </Text>
       <Flex>
-        <Select data={pointsOfSale} onChange={getGroupsOfClients} />
+        <Select data={pointsOfSale} handleChange={getGroupsOfClients} />
         <Text ml="15rem">Adicionar Grupo de Clientes</Text>
       </Flex>
       <Flex>

@@ -1,4 +1,4 @@
-import { Select as ChakraSelect } from '@chakra-ui/react'
+import { Select as ChakraSelect, SelectProps } from '@chakra-ui/react'
 
 interface PointOfSale {
   ativo: boolean
@@ -24,17 +24,18 @@ interface PointOfSale {
   ufnome: string
 }
 
-interface IProps {
+interface IProps extends SelectProps {
   data: PointOfSale[]
-  onChange: (event: string) => void
+  handleChange: (event: string) => void
 }
 
-const Select = ({ data, onChange }: IProps) => {
+const Select = ({ data, handleChange, width = '30rem', ...rest }: IProps) => {
   return (
     <ChakraSelect
       placeholder="Selecione o Ponto de Vendas"
-      onChange={(e) => onChange(e.target.value)}
-      width="30rem"
+      onChange={(e) => handleChange(e.target.value)}
+      width={width}
+      {...rest}
     >
       {data.map((item, index) => (
         <option key={index} value={item.id}>

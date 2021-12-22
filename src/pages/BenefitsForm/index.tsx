@@ -17,6 +17,8 @@ import * as yup from 'yup'
 import Button from '../../components/Button'
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
+import Select from '../../components/Select'
+import { usePointsOfSale } from '../../contexts/points-of-sale'
 import { apiWS } from '../../services'
 
 interface IProducts {
@@ -24,6 +26,7 @@ interface IProducts {
 }
 
 interface IBenefitsForm {
+  pontovendaid: string
   grupoclientesdescricao: string
   descricao: string
   isauferirpontosenabled: boolean
@@ -86,6 +89,8 @@ interface IBenefitsPostResponse {
 const schema = yup.object().shape({})
 
 const BenefitsForm = () => {
+  const { pointsOfSale } = usePointsOfSale()
+
   const [isLoading, setIsLoading] = useState(false)
 
   const navigate = useNavigate()
@@ -136,6 +141,7 @@ const BenefitsForm = () => {
 
   const formik = useFormik({
     initialValues: {
+      pontovendaid: '',
       grupoclientesdescricao: '',
       descricao: '',
       isauferirpontosenabled: false,
@@ -164,6 +170,10 @@ const BenefitsForm = () => {
     '2xl': '2fr 2fr',
   })
 
+  const selectPointsOfSale = (value: string) => {
+    formik.setFieldValue('pontovendaid', value)
+  }
+
   return (
     <Box padding={{ xl: '20', md: '6', lg: '8' }}>
       <Loading isLoading={isLoading} />
@@ -182,6 +192,18 @@ const BenefitsForm = () => {
                 Informações do ponto
               </Heading>
               <Divider />
+              <HStack alignItems={'flex-end'} width={'100%'} spacing={'8'}>
+                <Select
+                  data={pointsOfSale}
+                  handleChange={selectPointsOfSale}
+                  width={'100%'}
+                />
+                <Select
+                  data={pointsOfSale}
+                  handleChange={selectPointsOfSale}
+                  width={'100%'}
+                />
+              </HStack>
               <HStack width={'100%'} spacing={'8'}>
                 <HStack alignItems={'flex-end'} width={'50%'}>
                   <Input
