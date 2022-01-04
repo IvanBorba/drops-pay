@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import {
@@ -27,6 +27,7 @@ interface IProducts {
 
 interface IBenefitsForm {
   pontovendaid: string
+  grupoclientesid: string
   grupoclientesdescricao: string
   descricao: string
   isauferirpontosenabled: boolean
@@ -49,10 +50,6 @@ interface IBenefitsForm {
 
 interface IItens {
   uid: string
-  classificacao: string
-  tipo: string
-  tipodescricao: string
-  descricao: string
 }
 
 interface IBenefitsData {
@@ -86,18 +83,69 @@ interface IBenefitsPostResponse {
   message: string
 }
 
+interface IOptions {
+  label: string
+  value: string | number
+}
+
+interface IGroupClients {
+  id: number
+  pontovendaid: number
+  razaosocial: string
+  descricao: string
+  ativo: string
+}
+
+interface IGroupOfProducts {
+  uid: string
+  classificacao: string
+  tipo: string
+  tipodescricao: string
+  descricao: string
+}
+
 const schema = yup.object().shape({})
 
 const BenefitsForm = () => {
+  const [groupOfClients, setGroupOfClients] = useState<IGroupClients[]>([])
+  const [pointsOfSaleOptions, setPointsOfSaleOptions] = useState<IOptions[]>([
+    {
+      label: '',
+      value: '',
+    },
+  ])
+  const [productsOptions, setProductsOptions] = useState<IOptions[]>([])
+  const [products, setProducts] = useState<IGroupOfProducts[]>([])
+  const [GroupOfClientsOptions, setGroupOfClientsOptions] =
+    useState<IOptions[]>()
+
+  const [productItens, setProductItens] = useState<IItens[]>([
+    {
+      uid: '',
+    },
+  ])
+
   const { pointsOfSale } = usePointsOfSale()
 
-  const [isLoading, setIsLoading] = useState(false)
+  const handleOptions = (): IOptions[] => {
+    return pointsOfSale.map((point) => {
+      return {
+        label: point.razaosocial,
+        value: point.id,
+      }
+    })
+  }
 
-  const navigate = useNavigate()
+  useEffect(() => {
+    setPointsOfSaleOptions(handleOptions())
+  }, [pointsOfSale])
+
+  const [isLoading, setIsLoading] = useState(false)
 
   const toast = useToast()
 
   const onSubmit = async (values: IBenefitsForm) => {
+    console.log(values)
     setIsLoading(true)
     try {
       const {
@@ -142,6 +190,7 @@ const BenefitsForm = () => {
   const formik = useFormik({
     initialValues: {
       pontovendaid: '',
+      grupoclientesid: '',
       grupoclientesdescricao: '',
       descricao: '',
       isauferirpontosenabled: false,
@@ -159,11 +208,78 @@ const BenefitsForm = () => {
       referenciacashback: '',
       auferircashback: '',
       ativo: true,
-      itensvinculados: [],
+      itensvinculados: [
+        {
+          uid: '',
+        },
+      ],
     },
     validationSchema: schema,
     onSubmit,
   })
+
+  const handleGroupOfClients = async (id: number) => {
+    setIsLoading(true)
+    try {
+      const { data } = await apiWS.post<IGroupClients[]>('/WSGrupoClientes', {
+        updatekind: 996,
+        pontovendaid: id,
+      })
+
+      setGroupOfClients(data)
+
+      setGroupOfClientsOptions(
+        data.map((group) => {
+          return {
+            label: group.descricao,
+            value: group.id,
+          }
+        })
+      )
+    } catch {
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleProducts = async (id: number) => {
+    setIsLoading(true)
+    try {
+      const { data } = await apiWS.post<IGroupOfProducts[]>(
+        '/WSGrupoProdutos',
+        {
+          updatekind: 996,
+          pontovendaid: id,
+        }
+      )
+
+      setProducts(data)
+
+      setProductsOptions(
+        data.map((group) => {
+          return {
+            label: group.descricao,
+            value: group.uid,
+          }
+        })
+      )
+    } catch {
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const templateColumns = useBreakpointValue({
     lg: '4fr',
@@ -171,7 +287,41 @@ const BenefitsForm = () => {
   })
 
   const selectPointsOfSale = (value: string) => {
-    formik.setFieldValue('pontovendaid', value)
+    formik.setFieldValue('pontovendaid', parseInt(value))
+    handleGroupOfClients(parseInt(value))
+    handleProducts(parseInt(value))
+  }
+
+  const selectGroupOfClients = (value: string) => {
+    formik.setFieldValue('grupoclientesid', parseInt(value))
+  }
+
+  const selectDiscoutReference = (value: string) => {
+    formik.setFieldValue('referenciadesconto', value)
+  }
+
+  const selectCashbackReference = (value: string) => {
+    formik.setFieldValue('referenciacashback', value)
+  }
+
+  const selectPointsReference = (value: string) => {
+    formik.setFieldValue('referencia', value)
+  }
+
+  const selectItens = (value: string, idx: number) => {
+    formik.setFieldValue(`itensvinculados[${idx}.uid]`, value)
+  }
+
+  const addItens = () => {
+    formik.values.itensvinculados.push({
+      uid: '',
+    })
+    setProductItens([
+      ...productItens,
+      {
+        uid: '',
+      },
+    ])
   }
 
   return (
@@ -194,14 +344,17 @@ const BenefitsForm = () => {
               <Divider />
               <HStack alignItems={'flex-end'} width={'100%'} spacing={'8'}>
                 <Select
-                  data={pointsOfSale}
+                  options={pointsOfSaleOptions}
+                  placeholder="Selecione o ponto de vendas"
                   handleChange={selectPointsOfSale}
                   width={'100%'}
                 />
                 <Select
-                  data={pointsOfSale}
-                  handleChange={selectPointsOfSale}
+                  options={GroupOfClientsOptions || [{ label: '', value: '' }]}
+                  placeholder="Selecione o grupo de clientes"
+                  handleChange={selectGroupOfClients}
                   width={'100%'}
+                  isDisabled={!GroupOfClientsOptions?.length}
                 />
               </HStack>
               <HStack width={'100%'} spacing={'8'}>
@@ -249,13 +402,16 @@ const BenefitsForm = () => {
                 <Divider />
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
-                    <Input
-                      chakraVariant="filled"
-                      pr={110}
-                      label={'Referencia'}
+                    <Select
+                      options={[
+                        { label: 'Em valor', value: 'em valor' },
+                        { label: 'Em percentual', value: 'em percentual' },
+                      ]}
                       placeholder="Selecione a referencia"
-                      name={'referenciadesconto'}
+                      handleChange={selectDiscoutReference}
+                      width={'100%'}
                       isDisabled={!formik.values.isconcederdescontoenabled}
+                      variant={'filled'}
                     />
                   </HStack>
                   <HStack width={'50%'}>
@@ -282,13 +438,16 @@ const BenefitsForm = () => {
                 <Divider />
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
-                    <Input
-                      pr={110}
-                      label={'Referencia'}
+                    <Select
+                      options={[
+                        { label: 'Em valor', value: 'em valor' },
+                        { label: 'Em percentual', value: 'em percentual' },
+                      ]}
                       placeholder="Selecione a referencia"
-                      name={'referenciacashback'}
-                      chakraVariant="filled"
+                      handleChange={selectCashbackReference}
+                      width={'100%'}
                       isDisabled={!formik.values.isvalorcashbackenabled}
+                      variant={'filled'}
                     />
                   </HStack>
                   <HStack width={'50%'}>
@@ -317,13 +476,16 @@ const BenefitsForm = () => {
                 <Divider />
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
-                    <Input
-                      pr={110}
-                      label={'Referencia'}
-                      name={'referencia'}
-                      chakraVariant="filled"
+                    <Select
+                      options={[
+                        { label: 'Valor', value: 'valor' },
+                        { label: 'Quantidade', value: 'quantidade' },
+                      ]}
                       placeholder="Selecione a referencia"
+                      handleChange={selectPointsReference}
+                      width={'100%'}
                       isDisabled={!formik.values.isauferirpontosenabled}
+                      variant={'filled'}
                     />
                   </HStack>
                   <HStack width={'50%'}>
@@ -371,6 +533,32 @@ const BenefitsForm = () => {
                     />
                   </HStack>
                 </HStack>
+              </VStack>
+              <VStack>
+                {productItens.map((_, idx) => (
+                  <HStack
+                    key={idx}
+                    width={'100%'}
+                    spacing={'8'}
+                    justifyContent={'flex-start'}
+                  >
+                    <Select
+                      options={productsOptions}
+                      placeholder="Selecione a referencia"
+                      handleChange={(value: string) => selectItens(value, idx)}
+                      width={'100%'}
+                      isDisabled={!productsOptions.length}
+                      variant={'filled'}
+                    />
+
+                    {idx === productItens.length - 1 && (
+                      <>
+                        <Button text="X " color="gray" width={'18'} />
+                        <Button text="+" width={'18'} onClick={addItens} />
+                      </>
+                    )}
+                  </HStack>
+                ))}
               </VStack>
             </SimpleGrid>
             <HStack justifyContent={'flex-end'}>

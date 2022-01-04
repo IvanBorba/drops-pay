@@ -29,7 +29,6 @@ const Button = ({
       p={variant === 'small' ? '5px 15px' : '13px 20px'}
       onClick={onClick}
       fontSize={variant === 'small' ? 'sm' : 'md'}
-      minWidth={'36'}
       color={contrastColor[color]}
       {...rest}
     >

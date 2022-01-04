@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Box, Flex, Text } from '@chakra-ui/react'
 
@@ -15,8 +15,21 @@ interface GroupOfProducts {
   descricao: string
 }
 
+interface IOptions {
+  label: string
+  value: string | number
+}
+
 const GroupsOfProducts = () => {
   const [pointGroups, setPointGroups] = useState<GroupOfProducts[]>([])
+  const [groupOfClientsOptions, setGroupOfClientsOptions] = useState<
+    IOptions[]
+  >([
+    {
+      label: '',
+      value: '',
+    },
+  ])
 
   const { pointsOfSale } = usePointsOfSale()
 
@@ -28,13 +41,30 @@ const GroupsOfProducts = () => {
     })
   }
 
+  const handleOptions = (): IOptions[] => {
+    return pointsOfSale.map((point) => {
+      return {
+        label: point.razaosocial,
+        value: point.id,
+      }
+    })
+  }
+
+  useEffect(() => {
+    setGroupOfClientsOptions(handleOptions())
+  }, [])
+
   return (
     <Box px="3rem">
       <Text as="h1" fontWeight="bold" mb="2rem">
         Grupos de Produtos
       </Text>
       <Flex>
-        <Select data={pointsOfSale} handleChange={getGroupsOfProducts} />
+        <Select
+          options={groupOfClientsOptions}
+          placeholder="Selecione um ponto de vendas"
+          handleChange={getGroupsOfProducts}
+        />
       </Flex>
       <Flex>
         <ProductsTable data={pointGroups} />
