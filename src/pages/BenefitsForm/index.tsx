@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Button } from '@chakra-ui/button'
 import {
   Box,
   Divider,
@@ -10,133 +9,157 @@ import {
   SimpleGrid,
   VStack,
 } from '@chakra-ui/layout'
-import { useToast } from '@chakra-ui/react'
+import { useBreakpointValue, useToast } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
 import * as yup from 'yup'
 
+import Button from '../../components/Button'
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
-import { useLocations } from '../../contexts/locations'
-import { apiCep, apiCnpj, apiWS } from '../../services'
-import removeEspecialCharacter from '../../utils/removeEspecialCharacter'
+import Select from '../../components/Select'
+import { usePointsOfSale } from '../../contexts/points-of-sale'
+import { apiWS } from '../../services'
 
-interface ICNPJResponse {
-  message: string
-  status: string
-  complemento: string
-  nome: string
-  uf: string
-  telefone: string
-  email: string
-  bairro: string
-  logradouro: string
-  numero: string
-  cep: string
-  municipio: string
+interface IProducts {
+  uid: string
 }
 
-interface IFormValues {
-  cnpj: string
-  razaosocial: string
-  cep: string
-  logradouro: string
-  numero: string
-  complemento: string
-  cidadenome: string
-  bairro: string
-  ufnome: string
-  ativo: boolean
+interface IBenefitsForm {
+  pontovendaid: string
+  grupoclientesid: string
+  grupoclientesdescricao: string
+  descricao: string
+  isauferirpontosenabled: boolean
+  referencia: string
+  proporcao: string
+  auferirpontos: string
+  vigenciainicial: string
+  vigenciafinal: string
+  validadepontos: string
+  desprezarfracao: boolean
+  isconcederdescontoenabled: boolean
+  referenciadesconto: string
+  auferirdesconto: string
+  isvalorcashbackenabled: boolean
+  referenciacashback: string
+  auferircashback: string
+  ativo: true
+  itensvinculados: IProducts[]
 }
 
-interface IPointsOfSale {
-  updatekind: number
+interface IItens {
+  uid: string
+}
+
+interface IBenefitsData {
   id: number
-  cnpj: string
+  pontovendaid: number
   razaosocial: string
-  cep: string
-  logradouro: string
-  numero: number
-  complemento: string
-  cidadeid: number
-  cidadenome: string
-  bairroid: number
-  uf: string
-  ufnome: string
+  grupoclientesid: number
+  grupoclientesdescricao: string
+  descricao: string
+  isauferirpontosenabled: true
+  referencia: string
+  proporcao: number
+  auferirpontos: number
+  vigenciainicial: string
+  vigenciafinal: string
+  validadepontos: number
+  desprezarfracao: boolean
+  isconcederdescontoenabled: boolean
+  referenciadesconto: string
+  auferirdesconto: number
+  isvalorcashbackenabled: boolean
+  referenciacashback: string
+  auferircashback: number
   ativo: boolean
+  itensvinculados: IItens[]
 }
 
-interface IEstadoInfo {
-  nome: string
+interface IBenefitsPostResponse {
+  httpstatus: number
+  id: string
+  message: string
 }
 
-interface ILocationResponse {
-  bairro: string
-  cep: string
-  cidade: string
-  estado_info: IEstadoInfo
-  logradouro: string
+interface IOptions {
+  label: string
+  value: string | number
 }
 
-const schema = yup.object().shape({
-  cnpj: yup
-    .string()
-    .test('len', 'CNPJ inválido', (val) => {
-      if (val) {
-        const len = removeEspecialCharacter(val as string).length
-        return len === 14
-      }
-      return false
-    })
-    .required('Campo obrigatório.'),
-  razaosocial: yup.string().required('Campo obrigatório.'),
-  cep: yup
-    .string()
-    .test('len', 'Cep inválido', (val) => {
-      if (val) {
-        const len = removeEspecialCharacter(val as string).length
-        return len === 8
-      }
-      return false
-    })
-    .required('Campo obrigatório.'),
-  logradouro: yup.string().required('Campo obrigatório.'),
-  numero: yup.string().required('Campo obrigatório.'),
-  cidadenome: yup.string().required('Campo obrigatório.'),
-  bairro: yup.string().required('Campo obrigatório.'),
-  ufnome: yup.string().required('Campo obrigatório.'),
-})
+interface IGroupClients {
+  id: number
+  pontovendaid: number
+  razaosocial: string
+  descricao: string
+  ativo: string
+}
+
+interface IGroupOfProducts {
+  uid: string
+  classificacao: string
+  tipo: string
+  tipodescricao: string
+  descricao: string
+}
+
+const schema = yup.object().shape({})
 
 const BenefitsForm = () => {
+  const [groupOfClients, setGroupOfClients] = useState<IGroupClients[]>([])
+  const [pointsOfSaleOptions, setPointsOfSaleOptions] = useState<IOptions[]>([
+    {
+      label: '',
+      value: '',
+    },
+  ])
+  const [productsOptions, setProductsOptions] = useState<IOptions[]>([])
+  const [products, setProducts] = useState<IGroupOfProducts[]>([])
+  const [GroupOfClientsOptions, setGroupOfClientsOptions] =
+    useState<IOptions[]>()
+
+  const { pointsOfSale } = usePointsOfSale()
+
+  const handleOptions = (): IOptions[] => {
+    return pointsOfSale.map((point) => {
+      return {
+        label: point.razaosocial,
+        value: point.id,
+      }
+    })
+  }
+
+  useEffect(() => {
+    setPointsOfSaleOptions(handleOptions())
+  }, [pointsOfSale])
+
   const [isLoading, setIsLoading] = useState(false)
 
-  const navigate = useNavigate()
-
-  const { cities, states } = useLocations()
   const toast = useToast()
 
-  const createGroup = async (data: IPointsOfSale[]) => {
+  const onSubmit = async (values: IBenefitsForm) => {
+    console.log(values)
+    setIsLoading(true)
     try {
       const {
-        status,
-        data: { message, httpstatus },
-      } = await apiWS.post('/WSEmpresaControladora', data)
-      if (status === 200) {
-        toast({
-          title: 'Empresa cadastrada com sucesso.',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        })
-      }
-      if (httpstatus === 400) {
-        toast({
+        data: { httpstatus, message },
+      } = await apiWS.post<IBenefitsPostResponse>('WSBeneficio', values)
+
+      if (httpstatus === 200) {
+        return toast({
           title: message,
           status: 'success',
           duration: 5000,
           isClosable: true,
         })
       }
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
     } catch (e) {
       const error = e as AxiosError
       if (error?.response?.data.message) {
@@ -158,117 +181,57 @@ const BenefitsForm = () => {
     }
   }
 
-  const onSubmit = async (values: IFormValues) => {
-    setIsLoading(true)
-
-    const {
-      ativo,
-      // bairro,
-      cep,
-      cidadenome,
-      cnpj,
-      complemento,
-      logradouro,
-      numero,
-      razaosocial,
-      ufnome,
-    } = values
-
-    const citie = cities.find((citie) => {
-      return (
-        removeEspecialCharacter(citie.nome) ===
-        removeEspecialCharacter(values.cidadenome)
-      )
-    })
-
-    if (citie) {
-      const state = states.find((state) => state.id === parseInt(citie?.uf))
-      if (state) {
-        const data: IPointsOfSale[] = [
-          {
-            updatekind: 1,
-            id: 0,
-            cnpj,
-            razaosocial,
-            cep: removeEspecialCharacter(cep),
-            logradouro,
-            numero: parseInt(numero),
-            complemento,
-            cidadeid: citie?.id,
-            cidadenome,
-            bairroid: 0,
-            uf: state?.uf,
-            ufnome,
-            ativo,
-          },
-        ]
-
-        await createGroup(data)
-      }
-    }
-  }
-
   const formik = useFormik({
     initialValues: {
-      cnpj: '',
-      razaosocial: '',
-      cep: '',
-      logradouro: '',
-      numero: '',
-      complemento: '',
-      cidadenome: '',
-      bairro: '',
-      ufnome: '',
+      pontovendaid: '',
+      grupoclientesid: '',
+      grupoclientesdescricao: '',
+      descricao: '',
+      isauferirpontosenabled: false,
+      referencia: '',
+      proporcao: '',
+      auferirpontos: '',
+      vigenciainicial: '',
+      vigenciafinal: '',
+      validadepontos: '',
+      desprezarfracao: false,
+      isconcederdescontoenabled: false,
+      referenciadesconto: '',
+      auferirdesconto: '',
+      isvalorcashbackenabled: false,
+      referenciacashback: '',
+      auferircashback: '',
       ativo: true,
+      itensvinculados: [
+        {
+          uid: '',
+        },
+      ],
     },
     validationSchema: schema,
     onSubmit,
   })
 
-  const getCompanyData = async () => {
+  const handleGroupOfClients = async (id: number) => {
     setIsLoading(true)
     try {
-      const {
-        data: {
-          status,
-          message,
-          bairro,
-          cep,
-          complemento,
-          // email,
-          logradouro,
-          municipio,
-          nome,
-          numero,
-          // telefone,
-          uf,
-        },
-      } = await apiCnpj.get<ICNPJResponse>(
-        removeEspecialCharacter(formik.values.cnpj)
-      )
-      if (status === 'ERROR') {
-        return toast({
-          title: message,
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        })
-      }
-
-      formik.setValues({
-        ufnome: uf,
-        cep,
-        cidadenome: municipio,
-        ativo: true,
-        bairro,
-        cnpj: formik.values.cnpj,
-        complemento: complemento,
-        logradouro,
-        numero: numero,
-        razaosocial: nome,
+      const { data } = await apiWS.post<IGroupClients[]>('/WSGrupoClientes', {
+        updatekind: 996,
+        pontovendaid: id,
       })
+
+      setGroupOfClients(data)
+
+      setGroupOfClientsOptions(
+        data.map((group) => {
+          return {
+            label: group.descricao,
+            value: group.id,
+          }
+        })
+      )
     } catch {
-      toast({
+      return toast({
         title: 'Ocorreu um erro ao processar sua requisiçao.',
         status: 'error',
         duration: 5000,
@@ -279,31 +242,30 @@ const BenefitsForm = () => {
     }
   }
 
-  const getLocationData = async () => {
+  const handleProducts = async (id: number) => {
     setIsLoading(true)
     try {
-      const {
-        data: { bairro, cidade, estado_info, logradouro },
-      } = await apiCep.get<ILocationResponse>(
-        removeEspecialCharacter(formik.values.cep)
+      const { data } = await apiWS.post<IGroupOfProducts[]>(
+        '/WSGrupoProdutos',
+        {
+          updatekind: 996,
+          pontovendaid: id,
+        }
       )
 
-      formik.setValues({
-        ufnome: estado_info.nome,
-        cep: formik.values.cep,
-        cidadenome: cidade,
-        ativo: true,
-        bairro,
-        cnpj: formik.values.cnpj,
-        complemento: formik.values.complemento,
-        logradouro,
-        numero: formik.values.numero,
-        razaosocial: formik.values.razaosocial,
-      })
+      setProducts(data)
+
+      setProductsOptions(
+        data.map((group) => {
+          return {
+            label: group.descricao,
+            value: group.uid,
+          }
+        })
+      )
     } catch {
-      toast({
-        title:
-          'Ocorreu um erro ao processar sua requisiçao. Favor verique seu Cep.',
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
         status: 'error',
         duration: 5000,
         isClosable: true,
@@ -313,24 +275,95 @@ const BenefitsForm = () => {
     }
   }
 
+  const templateColumns = useBreakpointValue({
+    lg: '4fr',
+    '2xl': '2fr 2fr',
+  })
+
+  const selectPointsOfSale = (value: string) => {
+    formik.setFieldValue('pontovendaid', parseInt(value))
+    handleGroupOfClients(parseInt(value))
+    handleProducts(parseInt(value))
+  }
+
+  const selectGroupOfClients = (value: string) => {
+    formik.setFieldValue('grupoclientesid', parseInt(value))
+  }
+
+  const selectDiscoutReference = (value: string) => {
+    formik.setFieldValue('referenciadesconto', value)
+  }
+
+  const selectCashbackReference = (value: string) => {
+    formik.setFieldValue('referenciacashback', value)
+  }
+
+  const selectPointsReference = (value: string) => {
+    formik.setFieldValue('referencia', value)
+  }
+
+  const selectItens = (value: string, idx: number) => {
+    formik.setFieldValue(`itensvinculados[${idx}].uid`, value)
+  }
+
+  const addItens = () => {
+    formik.setFieldValue('itensvinculados', [
+      ...formik.values.itensvinculados,
+      { uid: '' },
+    ])
+  }
+
+  const removeItem = (removeIdx: number) => {
+    console.log(
+      removeIdx,
+      formik.values.itensvinculados.filter((_, idx) => idx !== removeIdx)
+    )
+    formik.setFieldValue(
+      'itensvinculados',
+      formik.values.itensvinculados.filter((_, idx) => idx !== removeIdx)
+    )
+  }
+
   return (
     <Box padding={{ xl: '20', md: '6', lg: '8' }}>
       <Loading isLoading={isLoading} />
 
       <FormikProvider value={formik}>
         <Form onSubmit={formik.handleSubmit}>
-          <SimpleGrid spacing={'6'} maxWidth={1280} margin={'0 auto'}>
+          <SimpleGrid
+            spacing={'6'}
+            maxWidth={1280}
+            margin={'0 auto'}
+            boxShadow={'0px 3.45362px 34.5362px rgba(170, 170, 170, 0.25);'}
+            padding={'16'}
+          >
             <VStack spacing={'2'}>
               <Heading fontWeight={'normal'} size={'lg'} alignSelf={'start'}>
                 Informações do ponto
               </Heading>
               <Divider />
+              <HStack alignItems={'flex-end'} width={'100%'} spacing={'8'}>
+                <Select
+                  options={pointsOfSaleOptions}
+                  placeholder="Selecione o ponto de vendas"
+                  handleChange={selectPointsOfSale}
+                  width={'100%'}
+                />
+                <Select
+                  options={GroupOfClientsOptions || [{ label: '', value: '' }]}
+                  placeholder="Selecione o grupo de clientes"
+                  handleChange={selectGroupOfClients}
+                  width={'100%'}
+                  isDisabled={!GroupOfClientsOptions?.length}
+                />
+              </HStack>
               <HStack width={'100%'} spacing={'8'}>
                 <HStack alignItems={'flex-end'} width={'50%'}>
                   <Input
                     pr={110}
-                    label={'Nome do produto'}
+                    label={'Descrição'}
                     name={'descricao'}
+                    placeholder={'Digite a descrição do benefício.'}
                   />
                 </HStack>
                 <HStack width={'50%'}>
@@ -338,17 +371,23 @@ const BenefitsForm = () => {
                     label={'Vigência Inicial'}
                     mask={'99/99/9999'}
                     name={'vigenciainicial'}
+                    placeholder={'Digite a data inicial.'}
                   />
                   <Input
                     label={'Vigência Final'}
                     mask={'99/99/9999'}
                     name={'vigenciafinal'}
+                    placeholder={'Digite a data final.'}
                   />
                 </HStack>
               </HStack>
             </VStack>
-            <HStack spacing={'8'}>
-              <VStack spacing={'2'} width={'50%'}>
+            <SimpleGrid
+              spacing={'8'}
+              flexDirection={'column'}
+              gridTemplateColumns={templateColumns}
+            >
+              <VStack spacing={'2'}>
                 <HStack width={'100%'}>
                   <Heading
                     fontWeight={'normal'}
@@ -358,46 +397,71 @@ const BenefitsForm = () => {
                   >
                     Descontos
                   </Heading>
-                  <Input variant="switch" name={'isauferirpontosenabled'} />
+                  <Input variant="switch" name={'isconcederdescontoenabled'} />
                 </HStack>
                 <Divider />
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
-                    <Input pr={110} label={'Referencia'} name={'referencia'} />
+                    <Select
+                      options={[
+                        { label: 'Em valor', value: 'em valor' },
+                        { label: 'Em percentual', value: 'em percentual' },
+                      ]}
+                      placeholder="Selecione a referencia"
+                      handleChange={selectDiscoutReference}
+                      width={'100%'}
+                      isDisabled={!formik.values.isconcederdescontoenabled}
+                      variant={'filled'}
+                    />
                   </HStack>
                   <HStack width={'50%'}>
-                    <Input label={'Proporção'} name={'proporcao'} />
+                    <Input
+                      chakraVariant="filled"
+                      label={'Desconto'}
+                      placeholder="Digite o valor do desconto."
+                      name={'auferirdesconto'}
+                      isDisabled={!formik.values.isconcederdescontoenabled}
+                    />
                   </HStack>
                 </HStack>
+                <HStack width={'100%'}>
+                  <Heading
+                    fontWeight={'normal'}
+                    size={'lg'}
+                    alignSelf={'start'}
+                    pr={'2'}
+                  >
+                    Cashback
+                  </Heading>
+                  <Input variant="switch" name={'isvalorcashbackenabled'} />
+                </HStack>
+                <Divider />
                 <HStack width={'100%'} spacing={'8'}>
-                  <HStack width={'50%'}>
-                    <Input
-                      label={'Quantidade de pontos'}
-                      name={'auferirpontos'}
+                  <HStack width={'50%'} alignItems={'flex-end'}>
+                    <Select
+                      options={[
+                        { label: 'Em valor', value: 'em valor' },
+                        { label: 'Em percentual', value: 'em percentual' },
+                      ]}
+                      placeholder="Selecione a referencia"
+                      handleChange={selectCashbackReference}
+                      width={'100%'}
+                      isDisabled={!formik.values.isvalorcashbackenabled}
+                      variant={'filled'}
                     />
                   </HStack>
                   <HStack width={'50%'}>
                     <Input
-                      label={'Validade dos pontos'}
-                      name={'validadepontos'}
-                    />
-                  </HStack>
-                </HStack>
-                <HStack
-                  width={'100%'}
-                  spacing={'8'}
-                  justifyContent={'flex-start'}
-                >
-                  <HStack width={'50%'}>
-                    <Input
-                      variant="switch"
-                      label={'Desprezar fração no cálculo'}
-                      name={'desprezarfracao'}
+                      label={'Cashback'}
+                      name={'auferircashback'}
+                      placeholder="Digite o valor do cashback."
+                      chakraVariant="filled"
+                      isDisabled={!formik.values.isvalorcashbackenabled}
                     />
                   </HStack>
                 </HStack>
               </VStack>
-              <VStack spacing={'2'} width={'50%'}>
+              <VStack spacing={'2'}>
                 <HStack width={'100%'}>
                   <Heading
                     fontWeight={'normal'}
@@ -412,23 +476,46 @@ const BenefitsForm = () => {
                 <Divider />
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
-                    <Input pr={110} label={'Referencia'} name={'referencia'} />
+                    <Select
+                      options={[
+                        { label: 'Valor', value: 'valor' },
+                        { label: 'Quantidade', value: 'quantidade' },
+                      ]}
+                      placeholder="Selecione a referencia"
+                      handleChange={selectPointsReference}
+                      width={'100%'}
+                      isDisabled={!formik.values.isauferirpontosenabled}
+                      variant={'filled'}
+                    />
                   </HStack>
                   <HStack width={'50%'}>
-                    <Input label={'Proporção'} name={'proporcao'} />
+                    <Input
+                      label={'Proporção'}
+                      name={'proporcao'}
+                      chakraVariant="filled"
+                      placeholder="Digite aqui a proporção."
+                      isDisabled={!formik.values.isauferirpontosenabled}
+                    />
                   </HStack>
                 </HStack>
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'}>
                     <Input
                       label={'Quantidade de pontos'}
+                      placeholder="Digite a quantidade de pontos."
                       name={'auferirpontos'}
+                      chakraVariant="filled"
+                      isDisabled={!formik.values.isauferirpontosenabled}
                     />
                   </HStack>
                   <HStack width={'50%'}>
                     <Input
                       label={'Validade dos pontos'}
                       name={'validadepontos'}
+                      chakraVariant="filled"
+                      mask={'99/99/9999'}
+                      placeholder="Digite aqui a data de validade."
+                      isDisabled={!formik.values.isauferirpontosenabled}
                     />
                   </HStack>
                 </HStack>
@@ -442,29 +529,45 @@ const BenefitsForm = () => {
                       variant="switch"
                       label={'Desprezar fração no cálculo'}
                       name={'desprezarfracao'}
+                      isDisabled={!formik.values.isauferirpontosenabled}
                     />
                   </HStack>
                 </HStack>
               </VStack>
-            </HStack>
+              <VStack>
+                {formik.values.itensvinculados?.map((_, idx) => (
+                  <HStack
+                    key={idx}
+                    width={'100%'}
+                    spacing={'8'}
+                    justifyContent={'flex-start'}
+                  >
+                    <Select
+                      options={productsOptions}
+                      placeholder="Selecione a referencia"
+                      handleChange={(value: string) => selectItens(value, idx)}
+                      width={'100%'}
+                      isDisabled={!productsOptions.length}
+                      variant={'filled'}
+                      value={formik.values.itensvinculados[idx].uid}
+                    />
 
-            <HStack justifyContent={'space-between'}>
-              <Button
-                bg={'red.400'}
-                color={'white'}
-                minWidth={150}
-                onClick={() => navigate(-1)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                bg={'green.400'}
-                color={'white'}
-                minWidth={150}
-                type="submit"
-              >
-                Salvar
-              </Button>
+                    <Button
+                      text="X "
+                      color="gray"
+                      width={'18'}
+                      onClick={() => removeItem(idx)}
+                    />
+                    {idx === formik.values.itensvinculados.length - 1 && (
+                      <Button text="+" width={'18'} onClick={addItens} />
+                    )}
+                  </HStack>
+                ))}
+              </VStack>
+            </SimpleGrid>
+            <HStack justifyContent={'flex-end'}>
+              <Button text="Cancelar" color="gray" />
+              <Button text="Cadastrar" type="submit" />
             </HStack>
           </SimpleGrid>
         </Form>

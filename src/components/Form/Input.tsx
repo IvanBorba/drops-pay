@@ -21,6 +21,7 @@ interface IInputProps extends InputProps {
   rightElement?: ReactNode
   variant?: 'switch' | 'input'
   mask?: string | Array<string | RegExp>
+  chakraVariant?: string
 }
 
 export const Input = ({
@@ -31,6 +32,7 @@ export const Input = ({
   pr,
   variant = 'input',
   mask,
+  chakraVariant = 'outline',
   ...rest
 }: IInputProps) => {
   const [field, meta] = useField(name)
@@ -38,6 +40,7 @@ export const Input = ({
   const variants = {
     input: (
       <ChackraInput
+        variant={chakraVariant}
         as={InputMask}
         mask={mask}
         {...rest}
@@ -45,7 +48,14 @@ export const Input = ({
         id={field.name}
       />
     ),
-    switch: <Switch isChecked={field.value} {...field} id={field.name} />,
+    switch: (
+      <Switch
+        isDisabled={rest.isDisabled}
+        isChecked={field.value}
+        {...field}
+        id={field.name}
+      />
+    ),
   }
 
   return (

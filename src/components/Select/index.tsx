@@ -1,44 +1,42 @@
-import { Select as ChakraSelect } from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
 
-interface PointOfSale {
-  ativo: boolean
-  avaliacao: number
-  bairroid: number
-  cep: string
-  cidadeid: number
-  cidadenome: string
-  cnpj: string
-  complemento: string
-  horariofuncionamento: Record<string, unknown>[]
-  id: number
-  imagebandeira: string
-  imagepontovenda: string
-  latitude: number
-  logradouro: string
-  longitude: number
-  nomefantasia: string
-  numero: number
-  produtos: Record<string, unknown>[]
-  razaosocial: string
-  uf: string
-  ufnome: string
+import {
+  Select as ChakraSelect,
+  SelectProps,
+  useStyleConfig,
+} from '@chakra-ui/react'
+
+interface IOptions {
+  label: string
+  value: string | number
 }
 
-interface IProps {
-  data: PointOfSale[]
-  onChange: (event: string) => void
+interface IProps extends SelectProps {
+  options: IOptions[]
+  placeholder: string
+  handleChange: (event: string) => void
+  value?: string
 }
 
-const Select = ({ data, onChange }: IProps) => {
+const Select = ({
+  options,
+  placeholder,
+  handleChange,
+  width = '30rem',
+  value,
+  ...rest
+}: IProps) => {
   return (
     <ChakraSelect
-      placeholder="Selecione o Ponto de Vendas"
-      onChange={(e) => onChange(e.target.value)}
-      width="30rem"
+      placeholder={placeholder}
+      onChange={(e) => handleChange(e.target.value)}
+      width={width}
+      value={value}
+      {...rest}
     >
-      {data.map((item, index) => (
-        <option key={index} value={item.id}>
-          {item.razaosocial}
+      {options.map((item, index) => (
+        <option key={index} value={item.value}>
+          {item.label}
         </option>
       ))}
     </ChakraSelect>

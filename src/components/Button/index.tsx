@@ -1,24 +1,36 @@
-import { Button as ChakraButton } from '@chakra-ui/react'
+import { Button as ChakraButton, ButtonProps } from '@chakra-ui/react'
 
-interface IProps {
+interface IProps extends ButtonProps {
   text: string
-  onClick: () => void
+  onClick?: () => void
   variant?: string
+  color?: 'gray' | 'green'
 }
 
-const Button = ({ text, onClick, variant = 'default' }: IProps) => {
+const Button = ({
+  text,
+  onClick,
+  variant = 'default',
+  color = 'green',
+  ...rest
+}: IProps) => {
+  const contrastColor = {
+    green: '#fff',
+    gray: '#868E96',
+  }
+
   return (
     <ChakraButton
-      colorScheme="green"
+      colorScheme={color}
       width={
         variant === 'small' ? 'minmax(60px, 88px)' : 'minmax(118px, 180px)'
       }
       height={variant === 'small' ? 'minmax(20px, 26px)' : 'minmax(30px, 48px)'}
-      borderRadius="30px"
       p={variant === 'small' ? '5px 15px' : '13px 20px'}
       onClick={onClick}
       fontSize={variant === 'small' ? 'sm' : 'md'}
-      _hover={{ bg: 'green.400' }}
+      color={contrastColor[color]}
+      {...rest}
     >
       {text}
     </ChakraButton>
