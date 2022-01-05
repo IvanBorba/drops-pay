@@ -1,4 +1,11 @@
-import { HiDocument } from 'react-icons/hi'
+import {
+  FaTh,
+  FaVectorSquare,
+  FaMapMarkerAlt,
+  FaShoppingCart,
+  FaUserCheck,
+  FaPollH,
+} from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 
 import { Box, Flex, Image } from '@chakra-ui/react'
@@ -15,45 +22,45 @@ const SideBar = () => {
       </Flex>
       <Flex flexDirection="column" px="2vw">
         <NavItem
-          Icon={HiDocument}
+          Icon={FaTh}
           title="Dashboard"
           description="Centralize seus dados"
           serviceNumber={1}
           onClick={() => navigate('/')}
         />
         <NavItem
-          Icon={HiDocument}
+          Icon={FaVectorSquare}
           title="Grupos de empresas"
           description="Crie e visualize os seus grupos"
           serviceNumber={2}
           onClick={() => navigate('/grupos-de-empresas')}
         />
         <NavItem
-          Icon={HiDocument}
+          Icon={FaMapMarkerAlt}
           title="Pontos de venda"
           description="Crie e visualize os seus pontos"
           serviceNumber={3}
           onClick={() => navigate('/pontos-de-venda')}
         />
         <NavItem
-          Icon={HiDocument}
+          Icon={FaUserCheck}
           title="Grupos de Clientes"
           description="Gerencie seus grupos de clientes"
           serviceNumber={4}
           onClick={() => navigate('/grupos-de-clientes')}
         />
         <NavItem
-          Icon={HiDocument}
+          Icon={FaShoppingCart}
           title="Grupos de Produtos"
           description="Gerencie os seus produtos"
           serviceNumber={5}
           onClick={() => navigate('/produtos')}
         />
         <NavItem
-          Icon={HiDocument}
+          Icon={FaPollH}
           title="Benefícios"
           description="Crie e visualize os benefícios"
-          serviceNumber={5}
+          serviceNumber={1}
           onClick={() => navigate('/beneficios')}
         />
       </Flex>

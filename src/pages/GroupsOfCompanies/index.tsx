@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
-import { Box, Flex } from '@chakra-ui/react'
+import { Box, Flex, Text } from '@chakra-ui/react'
 
 import Button from '../../components/Button'
 import SearchInput from '../../components/SearchInput'
@@ -60,33 +60,45 @@ const GroupsOfCompanies = () => {
   }, [nameFilter, companies])
 
   return (
-    <Box px="3rem">
-      <Flex justifyContent="space-evenly">
-        <Button
-          text="Adicionar empresa"
-          onClick={() => navigate('/novo-grupo')}
-        />
-        <SearchInput
-          text="Buscar por Razão Social"
-          onChange={(e) => {
-            setNameFilter(removeEspecialCharacter(e.target.value))
-            setCnpjFilter('')
-          }}
-          value={nameFilter}
-        />
-        <SearchInput
-          text="Buscar por CNPJ"
-          onChange={(e) => {
-            setCnpjFilter(removeEspecialCharacter(e.target.value))
-            setNameFilter('')
-          }}
-          value={cnpjFilter}
-          cnpj
-        />
+    <Box>
+      <Flex
+        justifyContent="center"
+        py="1.5rem"
+        mb="3rem"
+        boxShadow="0 4px 2px -2px lightgray"
+      >
+        <Text as="h1" fontWeight="bold">
+          Grupos de Empresas
+        </Text>
       </Flex>
-      <Table
-        data={filteredCompanies.length > 0 ? filteredCompanies : companies}
-      />
+      <Box px="3rem">
+        <Flex justifyContent="space-evenly">
+          <Button
+            text="Adicionar empresa"
+            onClick={() => navigate('/novo-grupo')}
+          />
+          <SearchInput
+            text="Buscar por Razão Social"
+            onChange={(e) => {
+              setNameFilter(removeEspecialCharacter(e.target.value))
+              setCnpjFilter('')
+            }}
+            value={nameFilter}
+          />
+          <SearchInput
+            text="Buscar por CNPJ"
+            onChange={(e) => {
+              setCnpjFilter(removeEspecialCharacter(e.target.value))
+              setNameFilter('')
+            }}
+            value={cnpjFilter}
+            cnpj
+          />
+        </Flex>
+        <Table
+          data={filteredCompanies.length > 0 ? filteredCompanies : companies}
+        />
+      </Box>
     </Box>
   )
 }

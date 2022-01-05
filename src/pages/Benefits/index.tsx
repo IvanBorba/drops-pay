@@ -50,20 +50,29 @@ const Benefits = () => {
   }
 
   return (
-    <Box px="3rem">
-      <Text as="h1" fontWeight="bold" mb="2rem">
-        Regras de Pontuação, Descontos e Cashback
-      </Text>
-      <Flex justifyContent="space-between">
-        <Select data={pointsOfSale} onChange={getBenefits} />
-        <Button
-          text="Adicionar benefício"
-          onClick={() => navigate('/novo-beneficio')}
-        />
+    <Box>
+      <Flex
+        justifyContent="center"
+        py="1.5rem"
+        mb="3rem"
+        boxShadow="0 4px 2px -2px lightgray"
+      >
+        <Text as="h1" fontWeight="bold">
+          Regras de Pontuação, Descontos e Cashback
+        </Text>
       </Flex>
-      <Flex>
-        <BenefitsTable data={benefits} />
-      </Flex>
+      <Box px="3rem">
+        <Flex justifyContent="space-between">
+          <Select data={pointsOfSale} onChange={getBenefits} />
+          <Button
+            text="Adicionar benefício"
+            onClick={() => navigate('/novo-beneficio')}
+          />
+        </Flex>
+        <Flex>
+          <BenefitsTable data={benefits} />
+        </Flex>
+      </Box>
     </Box>
   )
 }

@@ -29,16 +29,25 @@ const GroupsOfProducts = () => {
   }
 
   return (
-    <Box px="3rem">
-      <Text as="h1" fontWeight="bold" mb="2rem">
-        Grupos de Produtos
-      </Text>
-      <Flex>
-        <Select data={pointsOfSale} onChange={getGroupsOfProducts} />
+    <Box>
+      <Flex
+        justifyContent="center"
+        py="1.5rem"
+        mb="3rem"
+        boxShadow="0 4px 2px -2px lightgray"
+      >
+        <Text as="h1" fontWeight="bold">
+          Grupos de Produtos
+        </Text>
       </Flex>
-      <Flex>
-        <ProductsTable data={pointGroups} />
-      </Flex>
+      <Box px="3rem">
+        <Flex>
+          <Select data={pointsOfSale} onChange={getGroupsOfProducts} />
+        </Flex>
+        <Flex>
+          <ProductsTable data={pointGroups} />
+        </Flex>
+      </Box>
     </Box>
   )
 }

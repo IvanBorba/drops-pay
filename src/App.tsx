@@ -16,12 +16,7 @@ export const App = () => (
       >
         <SideBar />
       </GridItem>
-      <Grid
-        rowSpan={1}
-        colSpan={1}
-        templateRows={'minmax(5vh, 48px) auto'}
-        pt="3rem"
-      >
+      <Grid rowSpan={1} colSpan={1} templateRows={'minmax(5vh, 48px) auto'}>
         <AppRoutes />
       </Grid>
     </Grid>

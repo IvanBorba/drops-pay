@@ -73,8 +73,8 @@ const BenefitsTable = ({ data }: IProps) => {
           return (
             <Tr key={index}>
               <Td height="47px">{item.descricao}</Td>
-              <Td height="47px">{item.vigenciainicial}</Td>
-              <Td height="47px">{item.vigenciafinal}</Td>
+              <Td height="47px">{item.vigenciainicial || 'Não definida'}</Td>
+              <Td height="47px">{item.vigenciafinal || 'Não definida'}</Td>
               <Td height="47px">
                 {item.referencia === 'V'
                   ? 'Valor'
