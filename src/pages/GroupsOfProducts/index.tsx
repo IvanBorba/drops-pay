@@ -36,7 +36,7 @@ const GroupsOfProducts = () => {
         mb="3rem"
         boxShadow="0 4px 2px -2px lightgray"
       >
-        <Text as="h1" fontWeight="bold">
+        <Text as="h1" fontWeight="bold" fontSize="lg">
           Grupos de Produtos
         </Text>
       </Flex>

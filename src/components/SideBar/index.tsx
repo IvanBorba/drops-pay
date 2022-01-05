@@ -3,7 +3,7 @@ import {
   FaVectorSquare,
   FaMapMarkerAlt,
   FaShoppingCart,
-  FaUserCheck,
+  FaUserFriends,
   FaPollH,
 } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
@@ -43,7 +43,7 @@ const SideBar = () => {
           onClick={() => navigate('/pontos-de-venda')}
         />
         <NavItem
-          Icon={FaUserCheck}
+          Icon={FaUserFriends}
           title="Grupos de Clientes"
           description="Gerencie seus grupos de clientes"
           serviceNumber={4}
