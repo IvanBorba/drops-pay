@@ -5,9 +5,9 @@ import { Box, Flex, Text } from '@chakra-ui/react'
 
 import Button from '../../components/Button'
 import Select from '../../components/Select'
+import BenefitsTable from '../../components/Tables/BenefitsTable'
 import { usePointsOfSale } from '../../contexts/points-of-sale'
 import { apiWS } from '../../services'
-import BenefitsTable from '../../components/Tables/BenefitsTable'
 
 interface Benefit {
   id: string
