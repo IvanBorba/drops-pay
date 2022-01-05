@@ -55,20 +55,29 @@ const GroupsOfProducts = () => {
   }, [])
 
   return (
-    <Box px="3rem">
-      <Text as="h1" fontWeight="bold" mb="2rem">
-        Grupos de Produtos
-      </Text>
-      <Flex>
-        <Select
-          options={groupOfClientsOptions}
-          placeholder="Selecione um ponto de vendas"
-          handleChange={getGroupsOfProducts}
-        />
+    <Box>
+      <Flex
+        justifyContent="center"
+        py="1.5rem"
+        mb="3rem"
+        boxShadow="0 4px 2px -2px lightgray"
+      >
+        <Text as="h1" fontWeight="bold" fontSize="lg">
+          Grupos de Produtos
+        </Text>
       </Flex>
-      <Flex>
-        <ProductsTable data={pointGroups} />
-      </Flex>
+      <Box px="3rem">
+        <Flex>
+          <Select
+            options={groupOfClientsOptions}
+            placeholder="Selecione um ponto de vendas"
+            handleChange={getGroupsOfProducts}
+          />
+        </Flex>
+        <Flex>
+          <ProductsTable data={pointGroups} />
+        </Flex>
+      </Box>
     </Box>
   )
 }

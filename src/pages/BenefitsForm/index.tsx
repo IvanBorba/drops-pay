@@ -119,12 +119,6 @@ const BenefitsForm = () => {
   const [GroupOfClientsOptions, setGroupOfClientsOptions] =
     useState<IOptions[]>()
 
-  const [productItens, setProductItens] = useState<IItens[]>([
-    {
-      uid: '',
-    },
-  ])
-
   const { pointsOfSale } = usePointsOfSale()
 
   const handleOptions = (): IOptions[] => {
@@ -309,19 +303,25 @@ const BenefitsForm = () => {
   }
 
   const selectItens = (value: string, idx: number) => {
-    formik.setFieldValue(`itensvinculados[${idx}.uid]`, value)
+    formik.setFieldValue(`itensvinculados[${idx}].uid`, value)
   }
 
   const addItens = () => {
-    formik.values.itensvinculados.push({
-      uid: '',
-    })
-    setProductItens([
-      ...productItens,
-      {
-        uid: '',
-      },
+    formik.setFieldValue('itensvinculados', [
+      ...formik.values.itensvinculados,
+      { uid: '' },
     ])
+  }
+
+  const removeItem = (removeIdx: number) => {
+    console.log(
+      removeIdx,
+      formik.values.itensvinculados.filter((_, idx) => idx !== removeIdx)
+    )
+    formik.setFieldValue(
+      'itensvinculados',
+      formik.values.itensvinculados.filter((_, idx) => idx !== removeIdx)
+    )
   }
 
   return (
@@ -535,7 +535,7 @@ const BenefitsForm = () => {
                 </HStack>
               </VStack>
               <VStack>
-                {productItens.map((_, idx) => (
+                {formik.values.itensvinculados?.map((_, idx) => (
                   <HStack
                     key={idx}
                     width={'100%'}
@@ -549,13 +549,17 @@ const BenefitsForm = () => {
                       width={'100%'}
                       isDisabled={!productsOptions.length}
                       variant={'filled'}
+                      value={formik.values.itensvinculados[idx].uid}
                     />
 
-                    {idx === productItens.length - 1 && (
-                      <>
-                        <Button text="X " color="gray" width={'18'} />
-                        <Button text="+" width={'18'} onClick={addItens} />
-                      </>
+                    <Button
+                      text="X "
+                      color="gray"
+                      width={'18'}
+                      onClick={() => removeItem(idx)}
+                    />
+                    {idx === formik.values.itensvinculados.length - 1 && (
+                      <Button text="+" width={'18'} onClick={addItens} />
                     )}
                   </HStack>
                 ))}

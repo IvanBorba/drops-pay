@@ -1,4 +1,10 @@
-import { Select as ChakraSelect, SelectProps } from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
+
+import {
+  Select as ChakraSelect,
+  SelectProps,
+  useStyleConfig,
+} from '@chakra-ui/react'
 
 interface IOptions {
   label: string
@@ -9,6 +15,7 @@ interface IProps extends SelectProps {
   options: IOptions[]
   placeholder: string
   handleChange: (event: string) => void
+  value?: string
 }
 
 const Select = ({
@@ -16,6 +23,7 @@ const Select = ({
   placeholder,
   handleChange,
   width = '30rem',
+  value,
   ...rest
 }: IProps) => {
   return (
@@ -23,6 +31,7 @@ const Select = ({
       placeholder={placeholder}
       onChange={(e) => handleChange(e.target.value)}
       width={width}
+      value={value}
       {...rest}
     >
       {options.map((item, index) => (

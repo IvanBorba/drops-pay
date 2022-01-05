@@ -55,21 +55,30 @@ const GroupsOfClients = () => {
   }, [])
 
   return (
-    <Box px="3rem">
-      <Text as="h1" fontWeight="bold" mb="2rem">
-        Grupos de Clientes
-      </Text>
-      <Flex>
-        <Select
-          options={groupOfClientsOptions}
-          placeholder="Selecione o ponto de vendas"
-          handleChange={getGroupsOfClients}
-        />
-        <Text ml="15rem">Adicionar Grupo de Clientes</Text>
+    <Box>
+      <Flex
+        justifyContent="center"
+        py="1.5rem"
+        mb="3rem"
+        boxShadow="0 4px 2px -2px lightgray"
+      >
+        <Text as="h1" fontWeight="bold" fontSize="lg">
+          Grupos de Clientes
+        </Text>
       </Flex>
-      <Flex>
-        <ClientsTable data={pointGroups} />
-      </Flex>
+      <Box px="3rem">
+        <Flex>
+          <Select
+            options={groupOfClientsOptions}
+            placeholder="Selecione o ponto de vendas"
+            handleChange={getGroupsOfClients}
+          />
+          <Text ml="15rem">Adicionar Grupo de Clientes</Text>
+        </Flex>
+        <Flex>
+          <ClientsTable data={pointGroups} />
+        </Flex>
+      </Box>
     </Box>
   )
 }
