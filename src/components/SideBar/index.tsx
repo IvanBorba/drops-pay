@@ -16,8 +16,18 @@ import NavItem from './navItem'
 const SideBar = () => {
   const navigate = useNavigate()
   return (
-    <Box minH="100vh">
-      <Flex h="157" alignItems="center" justifyContent="center" bg="#F8F9FA">
+    <Box
+      minH="100vh"
+      position="fixed"
+      borderRight="0.5px solid rgba(0,0,0,0.1)"
+    >
+      <Flex
+        width="100%"
+        h="157"
+        alignItems="center"
+        justifyContent="center"
+        bg="#F8F9FA"
+      >
         <Image src={logo} alt="Logo" w="157px" />
       </Flex>
       <Flex flexDirection="column" px="2vw">

@@ -38,7 +38,7 @@ const NavItem = ({
       height="8vh"
       border="0.5px solid #F8F9FA"
       borderRadius="8"
-      pl="1vw"
+      px="1vw"
       py="1vh"
       alignItems="center"
       mt="2.3rem"
@@ -87,10 +87,22 @@ const NavItem = ({
         <Icon color={iconColor} />
       </Flex>
       <Flex w="80%" flexDirection="column" textAlign="justify">
-        <Text ml="0.5rem" fontSize="sm" letterSpacing="1px" fontWeight="bold">
+        <Text
+          mb="0.3rem"
+          ml="0.5rem"
+          fontSize="sm"
+          letterSpacing="1px"
+          fontWeight="bold"
+        >
           {title}
         </Text>
-        <Text ml="0.5rem" fontSize="xs" letterSpacing="1px" whiteSpace="nowrap">
+        <Text
+          ml="0.5rem"
+          color="grey.400"
+          fontSize="xs"
+          letterSpacing="1px"
+          whiteSpace="nowrap"
+        >
           {description}
         </Text>
       </Flex>

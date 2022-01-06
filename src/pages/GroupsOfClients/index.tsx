@@ -52,7 +52,7 @@ const GroupsOfClients = () => {
 
   useEffect(() => {
     setGroupOfClientsOptions(handleOptions())
-  }, [])
+  }, [pointsOfSale])
 
   return (
     <Box>
@@ -70,7 +70,7 @@ const GroupsOfClients = () => {
         <Flex>
           <Select
             options={groupOfClientsOptions}
-            placeholder="Selecione o ponto de vendas"
+            placeholder="Selecione um ponto de vendas"
             handleChange={getGroupsOfClients}
           />
           <Text ml="15rem">Adicionar Grupo de Clientes</Text>

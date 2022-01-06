@@ -43,7 +43,7 @@ const BenefitsTable = ({ data }: IProps) => {
       borderRadius="3.45px"
       boxShadow="rgba(73, 33, 33, 0.25) 0px 25px 50px -12px;"
     >
-      <Thead>
+      <Thead bg="grey.300">
         <Tr>
           {[
             'Produto (Descrição)',

@@ -52,7 +52,7 @@ const GroupsOfProducts = () => {
 
   useEffect(() => {
     setGroupOfClientsOptions(handleOptions())
-  }, [])
+  }, [pointsOfSale])
 
   return (
     <Box>

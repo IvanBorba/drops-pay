@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Box, Flex, Text } from '@chakra-ui/react'
@@ -34,10 +34,21 @@ interface Benefit {
   itensvinculados: string
 }
 
+interface IOptions {
+  label: string
+  value: string | number
+}
+
 const Benefits = () => {
   const navigate = useNavigate()
 
-  const [benefits, setBenefits] = useState<Benefit[]>([])
+  const [pointBenefits, setPointBenefits] = useState<Benefit[]>([])
+  const [benefitsOptions, setBenefitsOptions] = useState<IOptions[]>([
+    {
+      label: '',
+      value: '',
+    },
+  ])
 
   const { pointsOfSale } = usePointsOfSale()
 
@@ -45,9 +56,22 @@ const Benefits = () => {
     const data = [{ updatekind: 996, pontovendaid: `${id}` }]
 
     apiWS.post('/WSBeneficio', data).then((res) => {
-      setBenefits(res.data)
+      setPointBenefits(res.data)
     })
   }
+
+  const handleOptions = (): IOptions[] => {
+    return pointsOfSale.map((point) => {
+      return {
+        label: point.razaosocial,
+        value: point.id,
+      }
+    })
+  }
+
+  useEffect(() => {
+    setBenefitsOptions(handleOptions())
+  }, [pointsOfSale])
 
   return (
     <Box>
@@ -63,14 +87,18 @@ const Benefits = () => {
       </Flex>
       <Box px="3rem">
         <Flex justifyContent="space-between">
-          <Select data={pointsOfSale} onChange={getBenefits} />
+          <Select
+            options={benefitsOptions}
+            placeholder="Selecione um ponto de vendas"
+            handleChange={getBenefits}
+          />
           <Button
             text="Adicionar benefício"
             onClick={() => navigate('/novo-beneficio')}
           />
         </Flex>
         <Flex>
-          <BenefitsTable data={benefits} />
+          <BenefitsTable data={pointBenefits} />
         </Flex>
       </Box>
     </Box>
