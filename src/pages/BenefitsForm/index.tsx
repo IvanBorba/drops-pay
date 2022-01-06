@@ -20,6 +20,7 @@ import { Loading } from '../../components/Loading'
 import Select from '../../components/Select'
 import { usePointsOfSale } from '../../contexts/points-of-sale'
 import { apiWS } from '../../services'
+import { formatDate } from '../../utils/formatDate'
 
 interface IProducts {
   uid: string
@@ -115,7 +116,6 @@ const BenefitsForm = () => {
     },
   ])
   const [productsOptions, setProductsOptions] = useState<IOptions[]>([])
-  const [products, setProducts] = useState<IGroupOfProducts[]>([])
   const [GroupOfClientsOptions, setGroupOfClientsOptions] =
     useState<IOptions[]>()
 
@@ -139,12 +139,39 @@ const BenefitsForm = () => {
   const toast = useToast()
 
   const onSubmit = async (values: IBenefitsForm) => {
-    console.log(values)
     setIsLoading(true)
     try {
+      const data = {
+        updatekind: 1,
+        id: 0,
+        pontovendaid: values.pontovendaid,
+        razaosocial: pointsOfSale.find(
+          (point) => point.id === parseInt(values.pontovendaid)
+        )?.razaosocial,
+        grupoclientesid: values.grupoclientesid,
+        grupoclientesdescricao: values.grupoclientesdescricao,
+        descricao: values.descricao,
+        isauferirpontosenabled: values.isauferirpontosenabled,
+        referencia: values.referencia,
+        proporcao: values.proporcao,
+        auferirpontos: values.auferirpontos,
+        vigenciainicial: formatDate(values.vigenciainicial),
+        vigenciafinal: formatDate(values.vigenciafinal),
+        validadepontos: values.validadepontos,
+        desprezarfracao: values.desprezarfracao,
+        isconcederdescontoenabled: values.isconcederdescontoenabled,
+        referenciadesconto: values.referenciadesconto,
+        auferirdesconto: values.auferirdesconto,
+        isvalorcashbackenabled: values.isvalorcashbackenabled,
+        referenciacashback: values.referenciacashback,
+        auferircashback: values.auferircashback,
+        ativo: values.ativo,
+        itensvinculados: values.itensvinculados,
+      }
+
       const {
         data: { httpstatus, message },
-      } = await apiWS.post<IBenefitsPostResponse>('WSBeneficio', values)
+      } = await apiWS.post<IBenefitsPostResponse>('WSBeneficio', data)
 
       if (httpstatus === 200) {
         return toast({
@@ -253,8 +280,6 @@ const BenefitsForm = () => {
         }
       )
 
-      setProducts(data)
-
       setProductsOptions(
         data.map((group) => {
           return {
@@ -288,6 +313,10 @@ const BenefitsForm = () => {
 
   const selectGroupOfClients = (value: string) => {
     formik.setFieldValue('grupoclientesid', parseInt(value))
+    formik.setFieldValue(
+      'grupoclientesdescricao',
+      groupOfClients.find((group) => group.id === parseInt(value))?.descricao
+    )
   }
 
   const selectDiscoutReference = (value: string) => {
@@ -314,14 +343,12 @@ const BenefitsForm = () => {
   }
 
   const removeItem = (removeIdx: number) => {
-    console.log(
-      removeIdx,
-      formik.values.itensvinculados.filter((_, idx) => idx !== removeIdx)
-    )
-    formik.setFieldValue(
-      'itensvinculados',
-      formik.values.itensvinculados.filter((_, idx) => idx !== removeIdx)
-    )
+    if (removeIdx !== 0) {
+      formik.setFieldValue(
+        'itensvinculados',
+        formik.values.itensvinculados.filter((_, idx) => idx !== removeIdx)
+      )
+    }
   }
 
   return (
@@ -404,8 +431,8 @@ const BenefitsForm = () => {
                   <HStack width={'50%'} alignItems={'flex-end'}>
                     <Select
                       options={[
-                        { label: 'Em valor', value: 'em valor' },
-                        { label: 'Em percentual', value: 'em percentual' },
+                        { label: 'Em valor', value: 'V' },
+                        { label: 'Em percentual', value: 'P' },
                       ]}
                       placeholder="Selecione a referencia"
                       handleChange={selectDiscoutReference}
@@ -420,6 +447,7 @@ const BenefitsForm = () => {
                       label={'Desconto'}
                       placeholder="Digite o valor do desconto."
                       name={'auferirdesconto'}
+                      type={'number'}
                       isDisabled={!formik.values.isconcederdescontoenabled}
                     />
                   </HStack>
@@ -440,8 +468,8 @@ const BenefitsForm = () => {
                   <HStack width={'50%'} alignItems={'flex-end'}>
                     <Select
                       options={[
-                        { label: 'Em valor', value: 'em valor' },
-                        { label: 'Em percentual', value: 'em percentual' },
+                        { label: 'Em valor', value: 'V' },
+                        { label: 'Em percentual', value: 'P' },
                       ]}
                       placeholder="Selecione a referencia"
                       handleChange={selectCashbackReference}
@@ -456,6 +484,7 @@ const BenefitsForm = () => {
                       name={'auferircashback'}
                       placeholder="Digite o valor do cashback."
                       chakraVariant="filled"
+                      type={'number'}
                       isDisabled={!formik.values.isvalorcashbackenabled}
                     />
                   </HStack>
@@ -478,8 +507,8 @@ const BenefitsForm = () => {
                   <HStack width={'50%'} alignItems={'flex-end'}>
                     <Select
                       options={[
-                        { label: 'Valor', value: 'valor' },
-                        { label: 'Quantidade', value: 'quantidade' },
+                        { label: 'Valor', value: 'V' },
+                        { label: 'Quantidade', value: 'Q' },
                       ]}
                       placeholder="Selecione a referencia"
                       handleChange={selectPointsReference}
@@ -493,6 +522,7 @@ const BenefitsForm = () => {
                       label={'Proporção'}
                       name={'proporcao'}
                       chakraVariant="filled"
+                      type={'number'}
                       placeholder="Digite aqui a proporção."
                       isDisabled={!formik.values.isauferirpontosenabled}
                     />
@@ -504,6 +534,7 @@ const BenefitsForm = () => {
                       label={'Quantidade de pontos'}
                       placeholder="Digite a quantidade de pontos."
                       name={'auferirpontos'}
+                      type={'number'}
                       chakraVariant="filled"
                       isDisabled={!formik.values.isauferirpontosenabled}
                     />
@@ -513,7 +544,7 @@ const BenefitsForm = () => {
                       label={'Validade dos pontos'}
                       name={'validadepontos'}
                       chakraVariant="filled"
-                      mask={'99/99/9999'}
+                      type="number"
                       placeholder="Digite aqui a data de validade."
                       isDisabled={!formik.values.isauferirpontosenabled}
                     />
