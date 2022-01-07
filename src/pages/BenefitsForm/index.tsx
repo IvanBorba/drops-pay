@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 import {
   Box,
@@ -177,6 +178,13 @@ const BenefitsForm = () => {
   const [isLoading, setIsLoading] = useState(false)
 
   const toast = useToast()
+
+  const navigate = useNavigate()
+
+  const handleCancel = () => {
+    formik.resetForm()
+    navigate('/beneficios')
+  }
 
   const onSubmit = async (values: IBenefitsForm) => {
     setIsLoading(true)
@@ -426,6 +434,7 @@ const BenefitsForm = () => {
                   placeholder="Selecione o ponto de vendas"
                   handleChange={selectPointsOfSale}
                   width={'100%'}
+                  value={formik.values.pontovendaid}
                   errorMessage={formik.errors.pontovendaid}
                 />
                 <Select
@@ -435,6 +444,7 @@ const BenefitsForm = () => {
                   handleChange={selectGroupOfClients}
                   width={'100%'}
                   isDisabled={!GroupOfClientsOptions?.length}
+                  value={formik.values.grupoclientesid}
                   errorMessage={formik.errors.grupoclientesid}
                 />
               </HStack>
@@ -658,7 +668,7 @@ const BenefitsForm = () => {
               </VStack>
             </SimpleGrid>
             <HStack justifyContent={'flex-end'}>
-              <Button text="Cancelar" color="gray" />
+              <Button text="Cancelar" color="gray" onClick={handleCancel} />
               <Button text="Cadastrar" type="submit" />
             </HStack>
           </SimpleGrid>
