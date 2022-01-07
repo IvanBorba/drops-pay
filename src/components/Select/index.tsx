@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
 
 import {
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   Select as ChakraSelect,
   SelectProps,
+  SimpleGrid,
   useStyleConfig,
 } from '@chakra-ui/react'
 
@@ -16,6 +20,8 @@ interface IProps extends SelectProps {
   placeholder: string
   handleChange: (event: string) => void
   value?: string
+  errorMessage?: string
+  label?: string
 }
 
 const Select = ({
@@ -24,22 +30,30 @@ const Select = ({
   handleChange,
   width = '30rem',
   value,
+  label = '',
+  errorMessage = '',
   ...rest
 }: IProps) => {
   return (
-    <ChakraSelect
-      placeholder={placeholder}
-      onChange={(e) => handleChange(e.target.value)}
-      width={width}
-      value={value}
-      {...rest}
-    >
-      {options.map((item, index) => (
-        <option key={index} value={item.value}>
-          {item.label}
-        </option>
-      ))}
-    </ChakraSelect>
+    <FormControl isInvalid={!!errorMessage}>
+      <FormLabel minHeight={'24px'}>{label}</FormLabel>
+      <ChakraSelect
+        placeholder={placeholder}
+        onChange={(e) => handleChange(e.target.value)}
+        width={width}
+        value={value}
+        {...rest}
+      >
+        {options.map((item, index) => (
+          <option key={index} value={item.value}>
+            {item.label}
+          </option>
+        ))}
+      </ChakraSelect>
+      <SimpleGrid minHeight={'8'}>
+        <FormErrorMessage>{errorMessage}</FormErrorMessage>
+      </SimpleGrid>
+    </FormControl>
   )
 }
 
