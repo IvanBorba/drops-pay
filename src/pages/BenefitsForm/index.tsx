@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 import {
   Box,
@@ -54,13 +53,14 @@ interface IItens {
 }
 
 interface IBenefitsData {
+  updatekind: number
   id: number
   pontovendaid: number
   razaosocial: string
   grupoclientesid: number
   grupoclientesdescricao: string
   descricao: string
-  isauferirpontosenabled: true
+  isauferirpontosenabled: boolean
   referencia: string
   proporcao: number
   auferirpontos: number
@@ -105,7 +105,47 @@ interface IGroupOfProducts {
   descricao: string
 }
 
-const schema = yup.object().shape({})
+const schema = yup.object().shape({
+  pontovendaid: yup.string().required('Campo obrigatório.'),
+  grupoclientesid: yup.string().required('Campo obrigatório.'),
+  grupoclientesdescricao: yup.string().required('Campo obrigatório.'),
+  descricao: yup.string().required('Campo obrigatório.'),
+  referencia: yup.string().when('isauferirpontosenabled', {
+    is: true,
+    then: (schema) => schema.required('Campo Obrigatório'),
+  }),
+
+  proporcao: yup.string().when('isauferirpontosenabled', {
+    is: true,
+    then: (schema) => schema.required('Campo Obrigatório'),
+  }),
+  auferirpontos: yup.string().when('isauferirpontosenabled', {
+    is: true,
+    then: (schema) => schema.required('Campo Obrigatório'),
+  }),
+  vigenciainicial: yup.string().required('Campo obrigatório.'),
+  vigenciafinal: yup.string().required('Campo obrigatório.'),
+  validadepontos: yup.string().when('isauferirpontosenabled', {
+    is: true,
+    then: (schema) => schema.required('Campo Obrigatório'),
+  }),
+  referenciadesconto: yup.string().when('isconcederdescontoenabled', {
+    is: true,
+    then: (schema) => schema.required('Campo Obrigatório'),
+  }),
+  auferirdesconto: yup.string().when('isconcederdescontoenabled', {
+    is: true,
+    then: (schema) => schema.required('Campo Obrigatório'),
+  }),
+  referenciacashback: yup.string().when('isvalorcashbackenabled', {
+    is: true,
+    then: (schema) => schema.required('Campo Obrigatório'),
+  }),
+  auferircashback: yup.string().when('isvalorcashbackenabled', {
+    is: true,
+    then: (schema) => schema.required('Campo Obrigatório'),
+  }),
+})
 
 const BenefitsForm = () => {
   const [groupOfClients, setGroupOfClients] = useState<IGroupClients[]>([])
@@ -141,30 +181,40 @@ const BenefitsForm = () => {
   const onSubmit = async (values: IBenefitsForm) => {
     setIsLoading(true)
     try {
-      const data = {
+      if (formik.values.itensvinculados[0].uid === '') {
+        return toast({
+          title: 'É necessario vincular pelo menos 1 produto.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+
+      const data: IBenefitsData = {
         updatekind: 1,
         id: 0,
-        pontovendaid: values.pontovendaid,
-        razaosocial: pointsOfSale.find(
-          (point) => point.id === parseInt(values.pontovendaid)
-        )?.razaosocial,
-        grupoclientesid: values.grupoclientesid,
+        pontovendaid: parseInt(values.pontovendaid),
+        razaosocial:
+          pointsOfSale.find(
+            (point) => point.id === parseInt(values.pontovendaid)
+          )?.razaosocial || '',
+        grupoclientesid: parseInt(values.grupoclientesid),
         grupoclientesdescricao: values.grupoclientesdescricao,
         descricao: values.descricao,
         isauferirpontosenabled: values.isauferirpontosenabled,
         referencia: values.referencia,
-        proporcao: values.proporcao,
-        auferirpontos: values.auferirpontos,
+        proporcao: parseInt(values.proporcao) || 0,
+        auferirpontos: parseInt(values.auferirpontos) || 0,
         vigenciainicial: formatDate(values.vigenciainicial),
         vigenciafinal: formatDate(values.vigenciafinal),
-        validadepontos: values.validadepontos,
+        validadepontos: parseInt(values.validadepontos) || 0,
         desprezarfracao: values.desprezarfracao,
         isconcederdescontoenabled: values.isconcederdescontoenabled,
         referenciadesconto: values.referenciadesconto,
-        auferirdesconto: values.auferirdesconto,
+        auferirdesconto: parseInt(values.auferirdesconto) || 0,
         isvalorcashbackenabled: values.isvalorcashbackenabled,
         referenciacashback: values.referenciacashback,
-        auferircashback: values.auferircashback,
+        auferircashback: parseInt(values.auferircashback) || 0,
         ativo: values.ativo,
         itensvinculados: values.itensvinculados,
       }
@@ -371,17 +421,21 @@ const BenefitsForm = () => {
               <Divider />
               <HStack alignItems={'flex-end'} width={'100%'} spacing={'8'}>
                 <Select
+                  label="Ponto de vendas"
                   options={pointsOfSaleOptions}
                   placeholder="Selecione o ponto de vendas"
                   handleChange={selectPointsOfSale}
                   width={'100%'}
+                  errorMessage={formik.errors.pontovendaid}
                 />
                 <Select
+                  label="Grupo de clientes"
                   options={GroupOfClientsOptions || [{ label: '', value: '' }]}
                   placeholder="Selecione o grupo de clientes"
                   handleChange={selectGroupOfClients}
                   width={'100%'}
                   isDisabled={!GroupOfClientsOptions?.length}
+                  errorMessage={formik.errors.grupoclientesid}
                 />
               </HStack>
               <HStack width={'100%'} spacing={'8'}>
@@ -430,6 +484,7 @@ const BenefitsForm = () => {
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
                     <Select
+                      label="Referencia"
                       options={[
                         { label: 'Em valor', value: 'V' },
                         { label: 'Em percentual', value: 'P' },
@@ -439,6 +494,7 @@ const BenefitsForm = () => {
                       width={'100%'}
                       isDisabled={!formik.values.isconcederdescontoenabled}
                       variant={'filled'}
+                      errorMessage={formik.errors.referenciadesconto}
                     />
                   </HStack>
                   <HStack width={'50%'}>
@@ -467,6 +523,7 @@ const BenefitsForm = () => {
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
                     <Select
+                      label="Referencia"
                       options={[
                         { label: 'Em valor', value: 'V' },
                         { label: 'Em percentual', value: 'P' },
@@ -476,6 +533,7 @@ const BenefitsForm = () => {
                       width={'100%'}
                       isDisabled={!formik.values.isvalorcashbackenabled}
                       variant={'filled'}
+                      errorMessage={formik.errors.referenciacashback}
                     />
                   </HStack>
                   <HStack width={'50%'}>
@@ -506,6 +564,7 @@ const BenefitsForm = () => {
                 <HStack width={'100%'} spacing={'8'}>
                   <HStack width={'50%'} alignItems={'flex-end'}>
                     <Select
+                      label="Referencia"
                       options={[
                         { label: 'Valor', value: 'V' },
                         { label: 'Quantidade', value: 'Q' },
@@ -515,6 +574,7 @@ const BenefitsForm = () => {
                       width={'100%'}
                       isDisabled={!formik.values.isauferirpontosenabled}
                       variant={'filled'}
+                      errorMessage={formik.errors.referencia}
                     />
                   </HStack>
                   <HStack width={'50%'}>
@@ -574,8 +634,9 @@ const BenefitsForm = () => {
                     justifyContent={'flex-start'}
                   >
                     <Select
+                      label={idx === 0 ? 'Produto' : undefined}
                       options={productsOptions}
-                      placeholder="Selecione a referencia"
+                      placeholder="Selecione um produto"
                       handleChange={(value: string) => selectItens(value, idx)}
                       width={'100%'}
                       isDisabled={!productsOptions.length}
