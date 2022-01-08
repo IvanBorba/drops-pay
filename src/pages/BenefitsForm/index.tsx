@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import {
   Box,
@@ -179,17 +179,14 @@ const BenefitsForm = () => {
 
   const toast = useToast()
 
-  const navigate = useNavigate()
+  const params = useParams()
 
-  const handleCancel = () => {
-    formik.resetForm()
-    navigate('/beneficios')
-  }
+  const navigate = useNavigate()
 
   const onSubmit = async (values: IBenefitsForm) => {
     setIsLoading(true)
     try {
-      if (formik.values.itensvinculados[0].uid === '') {
+      if (values.itensvinculados[0].uid === '') {
         return toast({
           title: 'É necessario vincular pelo menos 1 produto.',
           status: 'error',
@@ -297,6 +294,10 @@ const BenefitsForm = () => {
     onSubmit,
   })
 
+  const handleCancel = () => {
+    formik.resetForm()
+    navigate('/beneficios')
+  }
   const handleGroupOfClients = async (id: number) => {
     setIsLoading(true)
     try {
