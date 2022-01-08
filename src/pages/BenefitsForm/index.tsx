@@ -12,6 +12,7 @@ import {
 import { useBreakpointValue, useToast } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
+import { stringify } from 'querystring'
 import * as yup from 'yup'
 
 import Button from '../../components/Button'
@@ -45,7 +46,7 @@ interface IBenefitsForm {
   isvalorcashbackenabled: boolean
   referenciacashback: string
   auferircashback: string
-  ativo: true
+  ativo: boolean
   itensvinculados: IProducts[]
 }
 
@@ -149,6 +150,7 @@ const schema = yup.object().shape({
 })
 
 const BenefitsForm = () => {
+  const [isEdit, setIdEdit] = useState(false)
   const [groupOfClients, setGroupOfClients] = useState<IGroupClients[]>([])
   const [pointsOfSaleOptions, setPointsOfSaleOptions] = useState<IOptions[]>([
     {
@@ -157,6 +159,7 @@ const BenefitsForm = () => {
     },
   ])
   const [productsOptions, setProductsOptions] = useState<IOptions[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [GroupOfClientsOptions, setGroupOfClientsOptions] =
     useState<IOptions[]>()
 
@@ -171,15 +174,87 @@ const BenefitsForm = () => {
     })
   }
 
+  const getBenefit = async (id: string) => {
+    setIsLoading(true)
+
+    try {
+      const params = { updatekind: 996, pontovendaid: 1 }
+
+      const { data } = await apiWS.post<IBenefitsData[]>('/WSBeneficio', params)
+
+      const [benefit] = data.filter((benefit) => benefit.id === parseInt(id))
+
+      const {
+        ativo,
+        auferircashback,
+        auferirdesconto,
+        auferirpontos,
+        descricao,
+        desprezarfracao,
+        grupoclientesdescricao,
+        grupoclientesid,
+        isauferirpontosenabled,
+        isconcederdescontoenabled,
+        isvalorcashbackenabled,
+        itensvinculados,
+        pontovendaid,
+        proporcao,
+        referencia,
+        referenciacashback,
+        referenciadesconto,
+        validadepontos,
+        vigenciafinal,
+        vigenciainicial,
+      } = benefit
+
+      formik.setValues({
+        ativo,
+        auferircashback: String(auferircashback),
+        auferirdesconto: String(auferirdesconto),
+        auferirpontos: String(auferirpontos),
+        descricao,
+        desprezarfracao,
+        grupoclientesdescricao,
+        grupoclientesid: String(grupoclientesid),
+        isauferirpontosenabled,
+        isconcederdescontoenabled,
+        isvalorcashbackenabled,
+        itensvinculados,
+        pontovendaid: String(pontovendaid),
+        proporcao: String(proporcao),
+        referencia,
+        referenciacashback,
+        referenciadesconto,
+        validadepontos: String(validadepontos),
+        vigenciafinal,
+        vigenciainicial,
+      })
+    } catch {
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisição.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   useEffect(() => {
     setPointsOfSaleOptions(handleOptions())
   }, [pointsOfSale])
 
-  const [isLoading, setIsLoading] = useState(false)
-
   const toast = useToast()
 
   const params = useParams()
+
+  useEffect(() => {
+    if (params.id) {
+      setIdEdit(true)
+      getBenefit(params.id)
+    }
+  }, [params.id])
 
   const navigate = useNavigate()
 
@@ -197,7 +272,7 @@ const BenefitsForm = () => {
 
       const data: IBenefitsData = {
         updatekind: 1,
-        id: 0,
+        id: isEdit ? parseInt(params.id || '0') : 0,
         pontovendaid: parseInt(values.pontovendaid),
         razaosocial:
           pointsOfSale.find(
@@ -506,6 +581,7 @@ const BenefitsForm = () => {
                       isDisabled={!formik.values.isconcederdescontoenabled}
                       variant={'filled'}
                       errorMessage={formik.errors.referenciadesconto}
+                      value={formik.values.referenciadesconto}
                     />
                   </HStack>
                   <HStack width={'50%'}>
@@ -545,6 +621,7 @@ const BenefitsForm = () => {
                       isDisabled={!formik.values.isvalorcashbackenabled}
                       variant={'filled'}
                       errorMessage={formik.errors.referenciacashback}
+                      value={formik.values.referenciacashback}
                     />
                   </HStack>
                   <HStack width={'50%'}>
@@ -586,6 +663,7 @@ const BenefitsForm = () => {
                       isDisabled={!formik.values.isauferirpontosenabled}
                       variant={'filled'}
                       errorMessage={formik.errors.referencia}
+                      value={formik.values.referencia}
                     />
                   </HStack>
                   <HStack width={'50%'}>
@@ -670,7 +748,7 @@ const BenefitsForm = () => {
             </SimpleGrid>
             <HStack justifyContent={'flex-end'}>
               <Button text="Cancelar" color="gray" onClick={handleCancel} />
-              <Button text="Cadastrar" type="submit" />
+              <Button text={isEdit ? 'Salvar' : 'Cadastrar'} type="submit" />
             </HStack>
           </SimpleGrid>
         </Form>
