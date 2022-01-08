@@ -12,7 +12,6 @@ import {
 import { useBreakpointValue, useToast } from '@chakra-ui/react'
 import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
-import { stringify } from 'querystring'
 import * as yup from 'yup'
 
 import Button from '../../components/Button'
@@ -174,73 +173,6 @@ const BenefitsForm = () => {
     })
   }
 
-  const getBenefit = async (id: string) => {
-    setIsLoading(true)
-
-    try {
-      const params = { updatekind: 996, pontovendaid: 1 }
-
-      const { data } = await apiWS.post<IBenefitsData[]>('/WSBeneficio', params)
-
-      const [benefit] = data.filter((benefit) => benefit.id === parseInt(id))
-
-      const {
-        ativo,
-        auferircashback,
-        auferirdesconto,
-        auferirpontos,
-        descricao,
-        desprezarfracao,
-        grupoclientesdescricao,
-        grupoclientesid,
-        isauferirpontosenabled,
-        isconcederdescontoenabled,
-        isvalorcashbackenabled,
-        itensvinculados,
-        pontovendaid,
-        proporcao,
-        referencia,
-        referenciacashback,
-        referenciadesconto,
-        validadepontos,
-        vigenciafinal,
-        vigenciainicial,
-      } = benefit
-
-      formik.setValues({
-        ativo,
-        auferircashback: String(auferircashback),
-        auferirdesconto: String(auferirdesconto),
-        auferirpontos: String(auferirpontos),
-        descricao,
-        desprezarfracao,
-        grupoclientesdescricao,
-        grupoclientesid: String(grupoclientesid),
-        isauferirpontosenabled,
-        isconcederdescontoenabled,
-        isvalorcashbackenabled,
-        itensvinculados,
-        pontovendaid: String(pontovendaid),
-        proporcao: String(proporcao),
-        referencia,
-        referenciacashback,
-        referenciadesconto,
-        validadepontos: String(validadepontos),
-        vigenciafinal,
-        vigenciainicial,
-      })
-    } catch {
-      return toast({
-        title: 'Ocorreu um erro ao processar sua requisição.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   useEffect(() => {
     setPointsOfSaleOptions(handleOptions())
   }, [pointsOfSale])
@@ -248,13 +180,6 @@ const BenefitsForm = () => {
   const toast = useToast()
 
   const params = useParams()
-
-  useEffect(() => {
-    if (params.id) {
-      setIdEdit(true)
-      getBenefit(params.id)
-    }
-  }, [params.id])
 
   const navigate = useNavigate()
 
@@ -298,6 +223,7 @@ const BenefitsForm = () => {
         ativo: values.ativo,
         itensvinculados: values.itensvinculados,
       }
+      console.log(data)
 
       const {
         data: { httpstatus, message },
@@ -438,6 +364,85 @@ const BenefitsForm = () => {
     lg: '4fr',
     '2xl': '2fr 2fr',
   })
+
+  const getBenefit = async (id: string) => {
+    setIsLoading(true)
+
+    try {
+      const params = { updatekind: 996, pontovendaid: 1 }
+
+      const { data } = await apiWS.post<IBenefitsData[]>('/WSBeneficio', params)
+
+      const [benefit] = data.filter((benefit) => benefit.id === parseInt(id))
+
+      const {
+        ativo,
+        auferircashback,
+        auferirdesconto,
+        auferirpontos,
+        descricao,
+        desprezarfracao,
+        grupoclientesdescricao,
+        grupoclientesid,
+        isauferirpontosenabled,
+        isconcederdescontoenabled,
+        isvalorcashbackenabled,
+        itensvinculados,
+        pontovendaid,
+        proporcao,
+        referencia,
+        referenciacashback,
+        referenciadesconto,
+        validadepontos,
+        vigenciafinal,
+        vigenciainicial,
+      } = benefit
+
+      formik.setValues({
+        ativo,
+        auferircashback: String(auferircashback),
+        auferirdesconto: String(auferirdesconto),
+        auferirpontos: String(auferirpontos),
+        descricao,
+        desprezarfracao,
+        grupoclientesdescricao,
+        grupoclientesid: String(grupoclientesid),
+        isauferirpontosenabled,
+        isconcederdescontoenabled,
+        isvalorcashbackenabled,
+        itensvinculados: itensvinculados.length
+          ? itensvinculados
+          : [{ uid: '' }],
+        pontovendaid: String(pontovendaid),
+        proporcao: String(proporcao),
+        referencia,
+        referenciacashback,
+        referenciadesconto,
+        validadepontos: String(validadepontos),
+        vigenciafinal,
+        vigenciainicial,
+      })
+
+      handleGroupOfClients(pontovendaid)
+      handleProducts(pontovendaid)
+    } catch {
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisição.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (params.id) {
+      setIdEdit(true)
+      getBenefit(params.id)
+    }
+  }, [params.id])
 
   const selectPointsOfSale = (value: string) => {
     formik.setFieldValue('pontovendaid', parseInt(value))

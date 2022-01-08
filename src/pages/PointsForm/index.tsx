@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { Button } from '@chakra-ui/button'
 import {
@@ -18,8 +18,10 @@ import * as yup from 'yup'
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
 import { useLocations } from '../../contexts/locations'
+import { usePointsOfSale } from '../../contexts/points-of-sale'
 import { apiCep, apiCnpj, apiWS } from '../../services'
 import removeEspecialCharacter from '../../utils/removeEspecialCharacter'
+import PointsOfSale from '../PointsOfSale'
 
 interface ICNPJResponse {
   message: string
@@ -111,8 +113,11 @@ const schema = yup.object().shape({
 })
 const PointsForm = () => {
   const [isLoading, setIsLoading] = useState(false)
+  const [isEdit, setIsEdit] = useState(false)
 
   const navigate = useNavigate()
+
+  const { pointsOfSale } = usePointsOfSale()
 
   const { cities, states } = useLocations()
   const toast = useToast()
@@ -165,7 +170,6 @@ const PointsForm = () => {
 
     const {
       ativo,
-      // bairro,
       cep,
       cidadenome,
       cnpj,
@@ -189,7 +193,7 @@ const PointsForm = () => {
         const data: IPointsOfSale[] = [
           {
             updatekind: 1,
-            id: 0,
+            id: isEdit ? parseInt(params.id || '0') : 0,
             cnpj,
             razaosocial,
             cep: removeEspecialCharacter(cep),
@@ -317,6 +321,58 @@ const PointsForm = () => {
       setIsLoading(false)
     }
   }
+
+  const getPoint = async (id: string) => {
+    setIsLoading(true)
+
+    try {
+      const [
+        {
+          ativo,
+          bairroid,
+          cep,
+          cidadenome,
+          cnpj,
+          complemento,
+          logradouro,
+          numero,
+          razaosocial,
+          ufnome,
+        },
+      ] = pointsOfSale.filter((point) => point.id === parseInt(id))
+
+      formik.setValues({
+        ativo,
+        bairro: String(bairroid),
+        cep,
+        cidadenome,
+        cnpj,
+        complemento,
+        logradouro,
+        numero: String(numero),
+        razaosocial,
+        ufnome,
+      })
+    } catch {
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisição.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const params = useParams()
+
+  useEffect(() => {
+    if (params.id) {
+      setIsEdit(true)
+      getPoint(params.id)
+    }
+  }, [params.id])
 
   return (
     <Box padding={{ xl: '20', md: '6', lg: '8' }}>

@@ -16,13 +16,14 @@ const AppRoutes = () => {
       <Route path="/" element={<Dashboard />} />
       <Route path="/novo-ponto-de-venda" element={<PointsForm />} />
       <Route path="/pontos-de-venda" element={<PointsOfSale />} />
+      <Route path="/pontos-de-venda/:id" element={<PointsForm />} />
       <Route path="/novo-grupo" element={<NewGroupForm />} />
       <Route path="/grupos-de-empresas" element={<GroupsOfCompanies />} />
       <Route path="/grupos-de-clientes" element={<GroupsOfClients />} />
       <Route path="/produtos" element={<GroupsOfProducts />} />
       <Route path="/beneficios" element={<Benefits />} />
       <Route path="/novo-beneficio" element={<BenefitsForm />} />
-      <Route path="/novo-beneficio/:id" element={<BenefitsForm />} />
+      <Route path="/beneficio/:id" element={<BenefitsForm />} />
     </Routes>
   )
 }
