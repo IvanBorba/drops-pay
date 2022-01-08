@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { Button } from '@chakra-ui/button'
 import {
@@ -17,6 +17,7 @@ import * as yup from 'yup'
 
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
+import { useCompanies } from '../../contexts/companies'
 import { useLocations } from '../../contexts/locations'
 import { apiCep, apiCnpj, apiWS } from '../../services'
 import removeEspecialCharacter from '../../utils/removeEspecialCharacter'
@@ -109,6 +110,7 @@ const schema = yup.object().shape({
 
 const NewGroupForm = () => {
   const [isLoading, setIsLoading] = useState(false)
+  const [isEdit, setIsEdit] = useState(false)
 
   const navigate = useNavigate()
 
@@ -187,7 +189,7 @@ const NewGroupForm = () => {
         const data: IPointsOfSale[] = [
           {
             updatekind: 1,
-            id: 0,
+            id: isEdit ? parseInt(params.id || '0') : 0,
             cnpj,
             razaosocial,
             cep: removeEspecialCharacter(cep),
@@ -312,6 +314,59 @@ const NewGroupForm = () => {
       setIsLoading(false)
     }
   }
+
+  const params = useParams()
+  const { companies } = useCompanies()
+
+  const getCompanie = (id: string) => {
+    setIsLoading(true)
+
+    try {
+      const [
+        {
+          ativo,
+          bairroid,
+          cep,
+          cidadenome,
+          cnpj,
+          complemento,
+          logradouro,
+          numero,
+          razaosocial,
+          ufnome,
+        },
+      ] = companies.filter((comp) => comp.id === parseInt(id))
+
+      formik.setValues({
+        ativo,
+        bairro: String(bairroid),
+        cep,
+        cidadenome,
+        cnpj,
+        complemento,
+        logradouro,
+        numero: String(numero),
+        razaosocial,
+        ufnome,
+      })
+    } catch {
+      return toast({
+        title: 'Ocorreu um erro ao processar sua requisiçao.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (params.id && companies.length) {
+      setIsEdit(true)
+      getCompanie(params.id)
+    }
+  }, [params.id, companies.length])
 
   return (
     <Box padding={{ xl: '20', md: '6', lg: '8' }}>
