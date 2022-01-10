@@ -70,7 +70,7 @@ const SideBar = () => {
           Icon={FaPollH}
           title="Benefícios"
           description="Crie e visualize os benefícios"
-          serviceNumber={1}
+          serviceNumber={6}
           onClick={() => navigate('/beneficios')}
         />
       </Flex>

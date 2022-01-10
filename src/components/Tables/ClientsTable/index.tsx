@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Box, Flex, Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 
 import Button from '../../Button'
+import { useNavigate } from 'react-router-dom'
 
 interface GroupOfClients {
   id: string
@@ -17,6 +18,8 @@ interface IProps {
 }
 
 const ClientsTable = ({ data }: IProps) => {
+  const navigate = useNavigate()
+
   const [att, setAtt] = useState<number>(0)
 
   useEffect(() => {

@@ -28,7 +28,9 @@ const NavItem = ({
       ? '#12B886'
       : serviceNumber === 4
       ? '#FE7E7E'
-      : '#7B61FF'
+      : serviceNumber === 5
+      ? '#7B61FF'
+      : '#3E7B80'
   )
 
   return (
@@ -53,7 +55,9 @@ const NavItem = ({
             ? '#12B886'
             : serviceNumber === 4
             ? '#FE7E7E'
-            : '#7B61FF'
+            : serviceNumber === 5
+            ? '#7B61FF'
+            : '#3E7B80'
         }`,
       }}
       onMouseOver={() => {
@@ -71,7 +75,9 @@ const NavItem = ({
             ? '#12B886'
             : serviceNumber === 4
             ? '#FE7E7E'
-            : '#7B61FF'
+            : serviceNumber === 5
+            ? '#7B61FF'
+            : '#3E7B80'
         )
       }}
     >

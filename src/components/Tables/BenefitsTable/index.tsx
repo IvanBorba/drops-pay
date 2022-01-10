@@ -3,6 +3,7 @@ import { FaCheck, FaTimesCircle } from 'react-icons/fa'
 import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 
 import Button from '../../Button'
+import { useNavigate } from 'react-router-dom'
 
 interface Benefit {
   id: string
@@ -34,6 +35,8 @@ interface IProps {
 }
 
 const BenefitsTable = ({ data }: IProps) => {
+  const navigate = useNavigate()
+
   return (
     <Table
       variant="striped"
@@ -107,7 +110,11 @@ const BenefitsTable = ({ data }: IProps) => {
                 )}
               </Td>
               <Td width="8rem">
-                <Button text="Mais" onClick={() => ''} variant="small" />
+                <Button
+                  text="Editar"
+                  onClick={() => navigate(`/beneficio/${item.id}`)}
+                  variant="small"
+                />
               </Td>
             </Tr>
           )

@@ -380,7 +380,13 @@ const PointsForm = () => {
 
       <FormikProvider value={formik}>
         <Form onSubmit={formik.handleSubmit}>
-          <SimpleGrid spacing={'6'} maxWidth={1280} margin={'0 auto'}>
+          <SimpleGrid
+            spacing={'6'}
+            maxWidth={1280}
+            margin={'0 auto'}
+            boxShadow={'0px 3.45362px 34.5362px rgba(170, 170, 170, 0.25);'}
+            padding={'16'}
+          >
             <VStack spacing={'2'}>
               <Heading fontWeight={'normal'} size={'lg'} alignSelf={'start'}>
                 Informações do ponto
@@ -401,7 +407,7 @@ const PointsForm = () => {
                         color={'white'}
                         onClick={getCompanyData}
                       >
-                        Preencher
+                        Pesquisar
                       </Button>
                     }
                   />
@@ -431,7 +437,7 @@ const PointsForm = () => {
                         color={'white'}
                         onClick={getLocationData}
                       >
-                        Preencher
+                        Pesquisar
                       </Button>
                     }
                   />
@@ -480,7 +486,7 @@ const PointsForm = () => {
                 minWidth={150}
                 type="submit"
               >
-                Salvar
+                {isEdit ? 'Editar' : 'Cadastrar'}
               </Button>
             </HStack>
           </SimpleGrid>

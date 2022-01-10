@@ -374,7 +374,13 @@ const NewGroupForm = () => {
 
       <FormikProvider value={formik}>
         <Form onSubmit={formik.handleSubmit}>
-          <SimpleGrid spacing={'6'} maxWidth={1280} margin={'0 auto'}>
+          <SimpleGrid
+            spacing={'6'}
+            maxWidth={1280}
+            margin={'0 auto'}
+            boxShadow={'0px 3.45362px 34.5362px rgba(170, 170, 170, 0.25);'}
+            padding={'16'}
+          >
             <VStack spacing={'2'}>
               <Heading fontWeight={'normal'} size={'lg'} alignSelf={'start'}>
                 Informações do grupo de empresas
@@ -395,7 +401,7 @@ const NewGroupForm = () => {
                         color={'white'}
                         onClick={getCompanyData}
                       >
-                        Preencher
+                        Pesquisar
                       </Button>
                     }
                   />
@@ -425,7 +431,7 @@ const NewGroupForm = () => {
                         color={'white'}
                         onClick={getLocationData}
                       >
-                        Preencher
+                        Pesquisar
                       </Button>
                     }
                   />
@@ -459,7 +465,7 @@ const NewGroupForm = () => {
                 </HStack>
               </HStack>
             </VStack>
-            <HStack justifyContent={'space-between'}>
+            <HStack justifyContent={'flex-end'}>
               <Button
                 bg={'red.400'}
                 color={'white'}
@@ -474,7 +480,7 @@ const NewGroupForm = () => {
                 minWidth={150}
                 type="submit"
               >
-                Salvar
+                {isEdit ? 'Editar' : 'Cadastrar'}
               </Button>
             </HStack>
           </SimpleGrid>

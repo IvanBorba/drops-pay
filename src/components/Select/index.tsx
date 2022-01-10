@@ -35,7 +35,7 @@ const Select = ({
   ...rest
 }: IProps) => {
   return (
-    <FormControl isInvalid={!!errorMessage}>
+    <FormControl isInvalid={!!errorMessage} maxWidth="50vw">
       <FormLabel minHeight={'24px'}>{label}</FormLabel>
       <ChakraSelect
         placeholder={placeholder}

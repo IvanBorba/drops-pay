@@ -8,6 +8,7 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import Button from '../../Button'
 
@@ -32,6 +33,9 @@ interface IProps {
 }
 
 const CompaniesAndPointsOfSaleTable = ({ data }: IProps) => {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   return (
     <ChakraTable
       variant="striped"
@@ -111,7 +115,15 @@ const CompaniesAndPointsOfSaleTable = ({ data }: IProps) => {
                 {item.logradouro}, {item.numero}
               </Td>
               <Td>
-                <Button text="Mais" onClick={() => ''} variant="small" />
+                <Button
+                  text="Editar"
+                  onClick={
+                    location.pathname === '/grupos-de-empresas'
+                      ? () => navigate(`/grupo-de-empresa/${item.id}`)
+                      : () => navigate(`/ponto-de-venda/${item.id}`)
+                  }
+                  variant="small"
+                />
               </Td>
             </Tr>
           )

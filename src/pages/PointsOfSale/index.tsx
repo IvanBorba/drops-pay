@@ -81,10 +81,6 @@ const PointsOfSale = () => {
       </Flex>
       <Box px="3rem">
         <Flex justifyContent="space-evenly">
-          <Button
-            text="Adicionar ponto"
-            onClick={() => navigate('/novo-ponto-de-venda')}
-          />
           <SearchInput
             text="Buscar por Razão Social"
             onChange={(e) => {
@@ -101,6 +97,10 @@ const PointsOfSale = () => {
             }}
             value={cnpjFilter}
             cnpj
+          />
+          <Button
+            text="Adicionar ponto"
+            onClick={() => navigate('/novo-ponto-de-venda')}
           />
         </Flex>
         <Table

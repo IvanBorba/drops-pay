@@ -26,29 +26,28 @@ const ProductsTable = ({ data }: IProps) => {
 
   return (
     <Table
-      width="60rem"
+      width="45rem"
       variant="striped"
       color="grey.400"
       colorScheme="table"
       mt="2rem"
       borderRadius="3.45px"
       boxShadow="rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;"
+      mb="3rem"
     >
       <Thead bg="grey.300" height="47px">
         <Tr>
-          {['Tipo', 'Descrição', 'Classificação', 'Opções'].map(
-            (item, index) => (
-              <Th
-                key={index}
-                fontWeight="bold"
-                lineHeight="23px"
-                letterSpacing="0.2px"
-                color="grey.400"
-              >
-                {item}
-              </Th>
-            )
-          )}
+          {['Tipo', 'Descrição', 'Classificação'].map((item, index) => (
+            <Th
+              key={index}
+              fontWeight="bold"
+              lineHeight="23px"
+              letterSpacing="0.2px"
+              color="grey.400"
+            >
+              {item}
+            </Th>
+          ))}
         </Tr>
       </Thead>
       <Tbody fontSize="sm">
@@ -58,9 +57,6 @@ const ProductsTable = ({ data }: IProps) => {
               <Td height="47px">{item.tipodescricao}</Td>
               <Td height="47px">{item.descricao}</Td>
               <Td height="47px">{item.classificacao}</Td>
-              <Td width="8rem">
-                <Button text="Mais" onClick={() => ''} variant="small" />
-              </Td>
             </Tr>
           )
         })}
@@ -73,9 +69,6 @@ const ProductsTable = ({ data }: IProps) => {
               -
             </Td>
             <Td textAlign="center" width="8rem">
-              -
-            </Td>
-            <Td textAlign="center" width="6rem">
               -
             </Td>
           </Tr>

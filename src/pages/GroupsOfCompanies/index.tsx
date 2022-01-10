@@ -73,10 +73,6 @@ const GroupsOfCompanies = () => {
       </Flex>
       <Box px="3rem">
         <Flex justifyContent="space-evenly">
-          <Button
-            text="Adicionar empresa"
-            onClick={() => navigate('/novo-grupo')}
-          />
           <SearchInput
             text="Buscar por Razão Social"
             onChange={(e) => {
@@ -93,6 +89,10 @@ const GroupsOfCompanies = () => {
             }}
             value={cnpjFilter}
             cnpj
+          />
+          <Button
+            text="Adicionar empresa"
+            onClick={() => navigate('/novo-grupo')}
           />
         </Flex>
         <Table

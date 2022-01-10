@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { Button } from '@chakra-ui/button'
 import {
   Box,
   Divider,
@@ -14,7 +15,6 @@ import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
 import * as yup from 'yup'
 
-import Button from '../../components/Button'
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
 import Select from '../../components/Select'
@@ -223,7 +223,6 @@ const BenefitsForm = () => {
         ativo: values.ativo,
         itensvinculados: values.itensvinculados,
       }
-      console.log(data)
 
       const {
         data: { httpstatus, message },
@@ -752,8 +751,22 @@ const BenefitsForm = () => {
               </VStack>
             </SimpleGrid>
             <HStack justifyContent={'flex-end'}>
-              <Button text="Cancelar" color="gray" onClick={handleCancel} />
-              <Button text={isEdit ? 'Salvar' : 'Cadastrar'} type="submit" />
+              <Button
+                bg={'red.400'}
+                color={'white'}
+                minWidth={150}
+                onClick={handleCancel}
+              >
+                Cancelar
+              </Button>
+              <Button
+                bg={'green.400'}
+                color={'white'}
+                minWidth={150}
+                type="submit"
+              >
+                {isEdit ? 'Editar' : 'Cadastrar'}
+              </Button>
             </HStack>
           </SimpleGrid>
         </Form>

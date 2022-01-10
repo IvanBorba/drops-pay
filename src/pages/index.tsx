@@ -16,7 +16,7 @@ const AppRoutes = () => {
       <Route path="/" element={<Dashboard />} />
       <Route path="/novo-ponto-de-venda" element={<PointsForm />} />
       <Route path="/pontos-de-venda" element={<PointsOfSale />} />
-      <Route path="/pontos-de-venda/:id" element={<PointsForm />} />
+      <Route path="/ponto-de-venda/:id" element={<PointsForm />} />
       <Route path="/novo-grupo" element={<NewGroupForm />} />
       <Route path="/grupos-de-empresas" element={<GroupsOfCompanies />} />
       <Route path="/grupo-de-empresa/:id" element={<NewGroupForm />} />
