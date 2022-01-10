@@ -86,7 +86,7 @@ const Benefits = () => {
         </Text>
       </Flex>
       <Box px="3rem">
-        <Flex justifyContent="center" alignItems={'center'}>
+        <Flex justifyContent="space-between" alignItems={'center'} pr="3rem">
           <Select
             options={benefitsOptions}
             placeholder="Selecione um ponto de vendas"

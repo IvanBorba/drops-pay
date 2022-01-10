@@ -15,6 +15,7 @@ import { AxiosError } from 'axios'
 import { useFormik, Form, FormikProvider } from 'formik'
 import * as yup from 'yup'
 
+import CustomButton from '../../components/Button'
 import { Input } from '../../components/Form/Input'
 import { Loading } from '../../components/Loading'
 import Select from '../../components/Select'
@@ -737,14 +738,14 @@ const BenefitsForm = () => {
                       value={formik.values.itensvinculados[idx].uid}
                     />
 
-                    <Button
+                    <CustomButton
                       text="X "
                       color="gray"
                       width={'18'}
                       onClick={() => removeItem(idx)}
                     />
                     {idx === formik.values.itensvinculados.length - 1 && (
-                      <Button text="+" width={'18'} onClick={addItens} />
+                      <CustomButton text="+" width={'18'} onClick={addItens} />
                     )}
                   </HStack>
                 ))}

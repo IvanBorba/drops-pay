@@ -1,9 +1,9 @@
 import { FaCheck, FaTimesCircle } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
 
 import { Table, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react'
 
 import Button from '../../Button'
-import { useNavigate } from 'react-router-dom'
 
 interface Benefit {
   id: string
