@@ -329,7 +329,6 @@ const PointsForm = () => {
       const [
         {
           ativo,
-          bairroid,
           cep,
           cidadenome,
           cnpj,
@@ -343,7 +342,7 @@ const PointsForm = () => {
 
       formik.setValues({
         ativo,
-        bairro: String(bairroid),
+        bairro: '',
         cep,
         cidadenome,
         cnpj,
@@ -471,7 +470,7 @@ const PointsForm = () => {
                 </HStack>
               </HStack>
             </VStack>
-            <HStack justifyContent={'space-between'}>
+            <HStack justifyContent={'flex-end'}>
               <Button
                 bg={'red.400'}
                 color={'white'}

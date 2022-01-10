@@ -36,6 +36,7 @@ const ClientsTable = ({ data }: IProps) => {
       mt="2rem"
       borderRadius="3.45px"
       boxShadow="rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;"
+      mb="3rem"
     >
       <Thead bg="grey.300" height="47px">
         <Tr>

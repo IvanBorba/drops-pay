@@ -95,9 +95,11 @@ const GroupsOfCompanies = () => {
             onClick={() => navigate('/novo-grupo')}
           />
         </Flex>
-        <Table
-          data={filteredCompanies.length > 0 ? filteredCompanies : companies}
-        />
+        <Flex pb="3rem">
+          <Table
+            data={filteredCompanies.length > 0 ? filteredCompanies : companies}
+          />
+        </Flex>
       </Box>
     </Box>
   )

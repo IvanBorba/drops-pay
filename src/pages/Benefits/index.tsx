@@ -97,7 +97,7 @@ const Benefits = () => {
             onClick={() => navigate('/novo-beneficio')}
           />
         </Flex>
-        <Flex>
+        <Flex pb="3rem">
           <BenefitsTable data={pointBenefits} />
         </Flex>
       </Box>

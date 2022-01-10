@@ -103,13 +103,15 @@ const PointsOfSale = () => {
             onClick={() => navigate('/novo-ponto-de-venda')}
           />
         </Flex>
-        <Table
-          data={
-            filteredPointsOfSale.length > 0
-              ? filteredPointsOfSale
-              : pointsOfSale
-          }
-        />
+        <Flex pb="3rem">
+          <Table
+            data={
+              filteredPointsOfSale.length > 0
+                ? filteredPointsOfSale
+                : pointsOfSale
+            }
+          />
+        </Flex>
       </Box>
     </Box>
   )
